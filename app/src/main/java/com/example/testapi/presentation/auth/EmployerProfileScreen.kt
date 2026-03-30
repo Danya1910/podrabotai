@@ -52,15 +52,15 @@ import com.example.testapi.ui.theme.White
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun EmployeeProfileScreen(
+fun EmployerProfileScreen(
     viewModel: UserViewModel,
     navController: NavController
 ) {
     val items = listOf(
-        BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.Favorites.route, icon = R.drawable.ic_navigation_heart),
-        BottomNavItem(route = Screen.EmployeeChats.route, icon = R.drawable.ic_message),
-        BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
+        BottomNavItem(route = Screen.EmployerWork.route, icon = R.drawable.ic_work),
+        BottomNavItem(route = Screen.MyAdvertisements.route, icon = R.drawable.ic_megaphone),
+        BottomNavItem(route = Screen.EmployerChats.route, icon = R.drawable.ic_message),
+        BottomNavItem(route = Screen.EmployerProfile.route, icon = R.drawable.ic_profile)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

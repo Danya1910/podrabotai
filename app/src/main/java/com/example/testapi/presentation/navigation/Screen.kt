@@ -31,8 +31,10 @@ sealed class Screen(val route: String) {
     object MyAdvertisements : Screen("myAd")
 
     object EmployeeProfile : Screen("employeeProfile")
+    object EmployerProfile : Screen("employerProfile")
 
-    object Chats : Screen("chats")
+    object EmployeeChats : Screen("employeeChats")
+    object EmployerChats : Screen("employerChats")
     object Chat : Screen("chat/{penpalId}?jobId={jobId}") {
 
         fun passArgs(penpalId: Int, jobId: Int? = null): String {

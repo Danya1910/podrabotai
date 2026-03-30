@@ -36,11 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -60,16 +58,16 @@ import com.example.testapi.ui.theme.White
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun ChatsScreen(
+fun EmployerChatsScreen(
     viewModel: ChatViewModel,
     navController: NavController,
 ) {
 
     val items = listOf(
-        BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_navigation_heart), 
-        BottomNavItem(route = Screen.Chats.route, icon = R.drawable.ic_message),
-        BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
+        BottomNavItem(route = Screen.EmployerWork.route, icon = R.drawable.ic_work),
+        BottomNavItem(route = Screen.MyAdvertisements.route, icon = R.drawable.ic_megaphone),
+        BottomNavItem(route = Screen.EmployerChats.route, icon = R.drawable.ic_message),
+        BottomNavItem(route = Screen.EmployerProfile.route, icon = R.drawable.ic_profile)
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -171,14 +169,6 @@ private fun Content(
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Напишите работодателю",
-                    color = SupportText,
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
-                )
             }
         }
     }
@@ -218,7 +208,7 @@ private fun Content(
 private fun Chat(
     chat: GetChatsResponse,
     navController: NavController,
-    ) {
+) {
     Box(
         modifier = Modifier
             .height(67.dp)

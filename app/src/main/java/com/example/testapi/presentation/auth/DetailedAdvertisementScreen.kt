@@ -1,6 +1,8 @@
 package com.example.testapi.presentation.auth
 
 import android.R.attr.padding
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,9 +39,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.testapi.R
+import com.example.testapi.domain.model.BottomNavItem
 import com.example.testapi.domain.model.DetailedAdvertisement
+import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
+import com.example.testapi.presentation.widget.CustomBottomBar
 import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.presentation.widget.CustomTopAppBarForDetailed
 import com.example.testapi.ui.theme.Blue
@@ -48,12 +55,23 @@ import com.example.testapi.ui.theme.White
 import java.time.LocalTime
 import kotlin.time.Duration
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun DetailedAdvertisementScreen(
     viewModel: AdvertisementViewModel,
     navController: NavController,
     jobId: Int
 ) {
+    val items = listOf(
+        BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
+        BottomNavItem(route = Screen.Favorites.route, icon = R.drawable.ic_navigation_heart),
+        BottomNavItem(route = Screen.EmployeeChats.route, icon = R.drawable.ic_message),
+        BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.background),
@@ -72,7 +90,19 @@ fun DetailedAdvertisementScreen(
                 )
             },
             bottomBar = {
-                // твой CustomBottomBar
+                CustomBottomBar(
+                    items = items,
+                    currentRoute = currentRoute,
+                    onItemClick = { item ->
+                        navController.navigate(item.route) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                        }
+                    }
+                )
             },
             content = { paddingValues ->
                 Content(

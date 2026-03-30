@@ -65,8 +65,8 @@ fun FavoritesAdvertisementsScreen(
 ) {
     val items = listOf(
         BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_profile), //поставить избранные
-        BottomNavItem(route = Screen.Chats.route, icon = R.drawable.ic_message),
+        BottomNavItem(route = Screen.Favorites.route, icon = R.drawable.ic_navigation_heart),
+        BottomNavItem(route = Screen.EmployeeChats.route, icon = R.drawable.ic_message),
         BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -102,6 +102,7 @@ fun FavoritesAdvertisementsScreen(
                     }
                 )
             },
+
             content = { paddingValues ->
                 Content(
                     paddingValues = paddingValues,

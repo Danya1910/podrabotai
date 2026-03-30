@@ -51,11 +51,12 @@ fun MyAdvertisementsScreen(
     navController: NavController
 ) {
     val items = listOf(
-        BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_profile), //поставить избранные
-        BottomNavItem(route = Screen.Chats.route, icon = R.drawable.ic_message),
-        BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
+        BottomNavItem(route = Screen.EmployerWork.route, icon = R.drawable.ic_work),
+        BottomNavItem(route = Screen.MyAdvertisements.route, icon = R.drawable.ic_megaphone),
+        BottomNavItem(route = Screen.EmployerChats.route, icon = R.drawable.ic_message),
+        BottomNavItem(route = Screen.EmployerProfile.route, icon = R.drawable.ic_profile)
     )
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 

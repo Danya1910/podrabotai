@@ -105,9 +105,6 @@ fun CreateAdvertisementScreen(
             topBar = {
                 CustomTopAppBar(text = "Новое объявление")
             },
-            bottomBar = {
-                // твой CustomBottomBar
-            },
             content = { paddingValues ->
                 Content(
                     viewModel = viewModel,

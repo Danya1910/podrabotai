@@ -2,7 +2,6 @@ package com.example.testapi.presentation.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -10,14 +9,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.testapi.domain.model.AdvertisementFilter
 import com.example.testapi.presentation.auth.ChangePasswordScreen
 import com.example.testapi.presentation.auth.ChatScreen
-import com.example.testapi.presentation.auth.ChatsScreen
+import com.example.testapi.presentation.auth.EmployeeChatsScreen
 import com.example.testapi.presentation.auth.CreateAdvertisementScreen
 import com.example.testapi.presentation.auth.DetailedAdvertisementScreen
 import com.example.testapi.presentation.auth.EmployeeProfileScreen
 import com.example.testapi.presentation.auth.EmployeeWorkScreen
+import com.example.testapi.presentation.auth.EmployerChatsScreen
+import com.example.testapi.presentation.auth.EmployerProfileScreen
 import com.example.testapi.presentation.auth.EmployerWorkScreen
 import com.example.testapi.presentation.auth.FavoritesAdvertisementsScreen
 import com.example.testapi.presentation.auth.FilterScreen
@@ -196,6 +196,17 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
         )
     }
 
+    //employer profile
+    composable(
+        route = Screen.EmployerProfile.route,
+    ) {
+        val viewModel: UserViewModel = hiltViewModel()
+        EmployerProfileScreen(
+            viewModel = viewModel,
+            navController = navController
+        )
+    }
+
     //changePassword
     composable(
         route = Screen.ChangePassword.route
@@ -207,11 +218,21 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
         )
     }
 
-    //chats
-    composable(route = Screen.Chats.route) {
+    //employee chats
+    composable(route = Screen.EmployeeChats.route) {
         val viewModel: ChatViewModel = hiltViewModel()
 
-        ChatsScreen(
+        EmployeeChatsScreen(
+            viewModel = viewModel,
+            navController = navController
+        )
+    }
+
+    //employer chats
+    composable(route = Screen.EmployerChats.route) {
+        val viewModel: ChatViewModel = hiltViewModel()
+
+        EmployerChatsScreen(
             viewModel = viewModel,
             navController = navController
         )

@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
@@ -261,7 +262,14 @@ private fun Content(
                     )
                 }
                 Spacer(modifier = Modifier.height(17.dp))
-                CommunicateButtons(onCallClick = {}, onWriteClick = {})
+                CommunicateButtons(onCallClick = {}, onWriteClick = {
+                    navController.navigate(
+                        Screen.Chat.passArgs(
+                            penpalId = ad?.user?.id ?: 0,
+                            jobId = jobId
+                        )
+                    )
+                })
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -343,7 +351,7 @@ private fun CommunicateButtons(
             modifier = Modifier
                 .height(40.dp)
                 .weight(1f)
-                .clickable { onCallClick() }
+                .clip(RoundedCornerShape(22.dp))
                 .border(
                     width = 1.dp,
                     color = Blue,
@@ -353,6 +361,7 @@ private fun CommunicateButtons(
                     color = White,
                     shape = RoundedCornerShape(22.dp)
                 )
+                .clickable { onCallClick() }
                 .padding(horizontal = 22.dp, vertical = 11.dp)
         ) {
             Text(
@@ -369,7 +378,7 @@ private fun CommunicateButtons(
             modifier = Modifier
                 .height(40.dp)
                 .weight(1f)
-                .clickable { onWriteClick() }
+                .clip(RoundedCornerShape(22.dp))
                 .border(
                     width = 1.dp,
                     color = Blue,
@@ -379,6 +388,11 @@ private fun CommunicateButtons(
                     color = Blue,
                     shape = RoundedCornerShape(22.dp)
                 )
+                .clickable {
+                    onWriteClick(
+
+                    )
+                }
                 .padding(horizontal = 22.dp, vertical = 11.dp)
         ) {
             Text(

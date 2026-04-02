@@ -47,9 +47,11 @@ import com.example.testapi.domain.model.BottomNavItem
 import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.widget.Advertisement
+import com.example.testapi.presentation.widget.AdvertisementFavoritesScreen
 import com.example.testapi.presentation.widget.CustomBottomBar
 import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.presentation.widget.MessageBox
+import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.TransparentWhite
@@ -126,8 +128,33 @@ private fun Content(
 
     val state = viewModel.getFavoritesState.value
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.getFavoritesState.value.isSuccessful) {
         viewModel.loadFavorites()
+    }
+
+    if (state.isLoading) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(32.dp)
+                    )
+            ) {
+                CircularProgressIndicator(
+                    color = Blue,
+                    strokeWidth = 7.dp,
+                    modifier = Modifier
+                        .size(50.dp)
+                )
+            }
+        }
     }
 
     LazyColumn(
@@ -138,11 +165,6 @@ private fun Content(
             .fillMaxSize()
     ) {
         when {
-            state.isLoading -> {
-                item {
-                    CircularProgressIndicator()
-                }
-            }
 
             state.error != null -> {
                 item {
@@ -155,7 +177,7 @@ private fun Content(
 
             state.isSuccessful -> {
                 items(state.favorites) { ad ->
-                    Advertisement(
+                    AdvertisementFavoritesScreen(
                         ad,
                         navController = navController,
                         viewModel = viewModel,
@@ -184,85 +206,3 @@ private fun Content(
     }
 }
 
-@Composable
-private fun SearchingField(
-    text: MutableState<String>
-) {
-    Box(
-        modifier = Modifier
-            .height(53.dp)
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = White,
-                shape = RoundedCornerShape(32.dp)
-            )
-            .background(
-                color = WhiteClearness80,
-                shape = RoundedCornerShape(32.dp)
-            ),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(all = 4.dp)
-                .fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(53.dp)
-                    .border(
-                        width = 1.dp,
-                        color = White,
-                        shape = RoundedCornerShape(32.dp)
-                    )
-                    .background(
-                        color = TransparentWhite,
-                        shape = RoundedCornerShape(32.dp)
-                    ),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = 13.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    BasicTextField(
-                        value = text.value,
-                        onValueChange = { text.value = it },
-                        singleLine = true,
-                        textStyle = TextStyle(color = SupportText, fontSize = 16.sp),
-                        modifier = Modifier
-                            .height(47.dp),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                contentAlignment = Alignment.CenterStart,
-                            ) {
-                                innerTextField()
-                            }
-                        }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(49.dp)
-                    .background(color = White, shape = CircleShape)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = null,
-                    tint = Color.Unspecified
-                )
-            }
-        }
-    }
-}

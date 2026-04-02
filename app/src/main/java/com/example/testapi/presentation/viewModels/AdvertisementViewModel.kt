@@ -262,7 +262,7 @@ class AdvertisementViewModel @Inject constructor(
                     isSuccessful = true,
                     addToHistory = addToHistoryUseCase(jobId = jobId)
                 )
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _addToHistoryState.value = _addToHistoryState.value.copy(
                     isLoading = false,
                     error = e.message
@@ -432,7 +432,7 @@ class AdvertisementViewModel @Inject constructor(
             _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
                 isLoading = true
             )
-            try{
+            try {
                 _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
                     isLoading = false,
                     isSuccessful = true,
@@ -498,7 +498,7 @@ class AdvertisementViewModel @Inject constructor(
         }
     }
 
-    fun clearErrors(){
+    fun clearErrors() {
         _createAdvertisementState.value = _createAdvertisementState.value.copy(
             error = null
         )

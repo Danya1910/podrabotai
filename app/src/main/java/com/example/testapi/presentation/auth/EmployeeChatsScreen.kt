@@ -1,6 +1,7 @@
 package com.example.testapi.presentation.auth
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,6 +56,9 @@ import com.example.testapi.ui.theme.ChatBlue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.White
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -65,7 +69,7 @@ fun EmployeeChatsScreen(
 
     val items = listOf(
         BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_navigation_heart), 
+        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_navigation_heart),
         BottomNavItem(route = Screen.EmployeeChats.route, icon = R.drawable.ic_message),
         BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
     )
@@ -205,7 +209,7 @@ private fun Content(
         state.getChats?.let { chats ->
             items(chats) { chat ->
                 Chat(chat = chat, navController = navController)
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(5.dp))
             }
         }
     }
@@ -247,7 +251,7 @@ private fun Chat(
                 .padding(start = 16.dp, end = 10.dp)
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_avatar),
+                painter = painterResource(R.drawable.ic_un_select),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier.size(55.dp)
@@ -257,6 +261,7 @@ private fun Chat(
             Column(
                 verticalArrangement = Arrangement.Top,
                 modifier = Modifier
+                    .padding(vertical = 5.dp)
                     .fillMaxHeight()
                     .padding(top = 8.dp, end = 10.dp)
                     .weight(1f)
@@ -272,8 +277,7 @@ private fun Chat(
                         .padding(horizontal = 5.dp)
                 ) {
                     Text(
-                        //text = chat.name,
-                        text = "Монтажер",
+                        text = chat.penpalName,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Inter,
@@ -288,7 +292,8 @@ private fun Chat(
                     fontFamily = Inter,
                     color = White,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 5.dp)
                 )
             }
 
@@ -298,7 +303,7 @@ private fun Chat(
                 modifier = Modifier.wrapContentWidth()
             ) {
                 Text(
-                    text = "12:16",
+                    text = TimeToDomain(time = chat.lastMessage.createdAt),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     fontFamily = Inter,
@@ -337,5 +342,22 @@ private fun Circle(
             fontFamily = Inter,
             color = White
         )
+    }
+}
+
+private fun TimeToDomain(
+    time: String
+) : String {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern(
+            "EEE, dd MMM yyyy HH:mm:ss z",
+            Locale.ENGLISH
+        )
+        val dateTime = ZonedDateTime.parse(time, formatter)
+
+        dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+    } catch (e: Exception) {
+        Log.d("ChatsScreenDebug", "error: ${e.message}")
+        ""
     }
 }

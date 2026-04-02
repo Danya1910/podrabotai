@@ -1,5 +1,6 @@
 package com.example.testapi.presentation.auth
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -89,6 +90,10 @@ private fun Content(
     navController: NavController,
     paddingValues: PaddingValues
 ) {
+
+    LaunchedEffect(Unit) {
+        Log.d("ConfirmationEmailScreen", "${viewModel.temporaryId}")
+    }
 
     LaunchedEffect(viewModel.confirmMailState.value.isSuccessful) {
         if (viewModel.confirmMailState.value.isSuccessful) {

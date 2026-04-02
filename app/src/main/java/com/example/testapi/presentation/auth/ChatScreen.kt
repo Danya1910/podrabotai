@@ -34,15 +34,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,12 +48,10 @@ import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.viewModels.ChatViewModel
 import com.example.testapi.presentation.widget.AdvertisementForChat
 import com.example.testapi.presentation.widget.CustomTopAppBar
-import com.example.testapi.presentation.widget.CustomTopAppBarForDetailed
 import com.example.testapi.presentation.widget.MineMessage
 import com.example.testapi.presentation.widget.StrangerMessage
 import com.example.testapi.ui.theme.BackgroundForInputField
 import com.example.testapi.ui.theme.Blue
-import com.example.testapi.ui.theme.ChatBlue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.White
@@ -123,6 +117,7 @@ private fun Content(
         }
     }
 
+
     val createState = viewModel.createChatState.value
 
     LaunchedEffect(createState.error == "HTTP 406 NOT ACCEPTABLE") {
@@ -130,6 +125,13 @@ private fun Content(
             Log.d("ChatDebug", createState.error)
             viewModel.loadHistory(penpalId)
         }
+    }
+
+    LaunchedEffect(viewModel.getChatHistoryState.value.error) {
+        Log.d(
+            "ChatDebug",
+            "getChatHistoryState error: ${viewModel.getChatHistoryState.value.error}"
+        )
     }
 
 

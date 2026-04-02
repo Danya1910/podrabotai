@@ -110,9 +110,6 @@ fun UpdateAdvertisementScreen(
             topBar = {
                 CustomTopAppBar(text = "Редактирование")
             },
-            bottomBar = {
-                // твой CustomBottomBar
-            },
             content = { paddingValues ->
                 Content(
                     viewModel = viewModel,

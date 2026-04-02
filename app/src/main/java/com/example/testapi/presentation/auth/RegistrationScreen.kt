@@ -97,7 +97,10 @@ fun RegistrationContent(
 
     LaunchedEffect(viewModel.registerState.value.isSuccessful) {
         if (viewModel.registerState.value.isSuccessful) {
-            viewModel.localRepository.saveData(email = email.toString(), password = password.toString())
+            viewModel.localRepository.saveData(
+                email = email.value,
+                password = password.value
+            )
             val data = viewModel.getUserData()
             Log.d("RegistrationScreen", "${data?.email},${data?.password}")
             navController.navigate(Screen.ConfirmMail.route) {
@@ -287,15 +290,13 @@ private fun CheckForm(
     } else if (password.value != repeatPassword.value) {
         showError.value = true
         messageError.value = "Пароли не совпадают"
-    } else if (viewModel.registerState.value.error == "HTTP 500 INTERNAL SERVER ERROR"){
+    } else if (viewModel.registerState.value.error == "HTTP 500 INTERNAL SERVER ERROR") {
         showError.value = true
         messageError.value = "Пользователь с такой почтой уже существует"
-    }
-  else if (!emailPattern.matches(email.value)) {
+    } else if (!emailPattern.matches(email.value)) {
         showError.value = true
         messageError.value = "Введите корректную почту"
-    }
-    else {
+    } else {
         if (role.value == "Соискатель")
             roleToDto = "finder"
         if (role.value == "Работодатель")

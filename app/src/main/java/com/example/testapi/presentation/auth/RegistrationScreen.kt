@@ -257,7 +257,9 @@ fun RegistrationContent(
         if (showError.value) {
             MessageBox(
                 text = messageError.value,
-                showError = showError,
+                onDismiss = {
+                    showError.value = false
+                },
                 modifier = Modifier
                     .padding(bottom = 30.dp)
                     .fillMaxWidth()

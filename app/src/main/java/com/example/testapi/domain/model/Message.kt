@@ -2,7 +2,7 @@ package com.example.testapi.domain.model
 
 data class Message(
     val createdAt: String,
-    val isReaded: Boolean,
+    val isRead: Boolean,
     val senderId: Int,
     val text: String
 )

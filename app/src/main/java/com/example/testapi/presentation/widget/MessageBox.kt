@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun MessageBox(
     text: String,
-    showError: MutableState<Boolean>,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -50,6 +50,6 @@ fun MessageBox(
 
     LaunchedEffect(Unit) {
         delay(2000)
-        showError.value = false
+        onDismiss()
     }
 }

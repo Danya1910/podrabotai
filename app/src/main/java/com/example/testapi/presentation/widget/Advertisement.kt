@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -109,7 +110,9 @@ fun Advertisement(
             Spacer(modifier = Modifier.height(8.dp))
             InfoFields(
                 address = ad.address,
-                time = calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                time = remember(ad.timeStart, ad.timeEnd) {
+                    calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

@@ -50,7 +50,13 @@ import com.example.testapi.ui.theme.Yellow
 
 @Composable
 fun AdvertisementForChat(
-    ad: DetailedAdvertisement,
+    address: String,
+    car: Boolean,
+    isUrgent: Boolean,
+    timeEnd: String,
+    timeStart: String,
+    title: String,
+    salary: Int,
     viewModel: AdvertisementViewModel? = null,
     message: MutableState<String>? = null,
     showMessage: MutableState<Boolean>? = null
@@ -75,7 +81,7 @@ fun AdvertisementForChat(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = ad.title,
+                    text = title,
                     fontWeight = FontWeight.Normal,
                     fontFamily = Inter,
                     fontSize = 16.sp,
@@ -84,23 +90,23 @@ fun AdvertisementForChat(
                 Spacer(modifier = Modifier.weight(1f))
                 if (viewModel != null) {
                     IconsRow(
-                        isUrgent = ad.isUrgent,
-                        car = ad.car,
+                        isUrgent = isUrgent,
+                        car = car,
                         viewModel = viewModel,
                         message = message,
                         showMessage = showMessage,
-                        jobId = ad.id
+                        //jobId = ad.id
                     )
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             InfoFields(
-                address = ad.address,
-                time = calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                address = address,
+                time = calculateWorkHours(timeStart = timeStart, timeEnd = timeEnd)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = ad.salary.toString(),
+                text = salary.toString(),
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = Inter,
                 fontSize = 16.sp,

@@ -79,7 +79,7 @@ private fun Content(
     val errorMessage = remember { mutableStateOf("") }
 
     LaunchedEffect(viewModel.recoveryPasswordState.value.isSuccessful) {
-        if(viewModel.recoveryPasswordState.value.isSuccessful){
+        if (viewModel.recoveryPasswordState.value.isSuccessful) {
             navController.navigate("main_graph") {
                 popUpTo("auth_graph") {
                     inclusive = true
@@ -153,7 +153,9 @@ private fun Content(
         if (showError.value) {
             MessageBox(
                 text = errorMessage.value,
-                showError = showError,
+                onDismiss = {
+                    showError.value = false
+                },
                 modifier = Modifier
                     .padding(bottom = 30.dp)
                     .fillMaxWidth()

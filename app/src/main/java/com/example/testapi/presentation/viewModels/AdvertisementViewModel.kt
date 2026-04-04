@@ -39,6 +39,9 @@ import com.example.testapi.presentation.states.RegisterState
 import com.example.testapi.presentation.states.UpdateAdvertisementState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hilt_aggregated_deps._com_example_testapi_di_AdvertisementModule
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -64,14 +67,14 @@ class AdvertisementViewModel @Inject constructor(
     private val _getDetailedAdvertisementState = mutableStateOf(GetDetailedAdvertisementState())
     private val _createAdvertisementState = mutableStateOf(CreateAdvertisementState())
     private val _updateAdvertisementState = mutableStateOf(UpdateAdvertisementState())
-    val _addToFavoriteState = mutableStateOf(AddToFavoriteState())
-    val _deleteFromFavoriteState = mutableStateOf(DeleteFromFavoriteState())
-    val _addToHistoryState = mutableStateOf(AddToHistoryState())
-    val _getHistoryState = mutableStateOf(GetHistoryState())
-    val _getFavoritesState = mutableStateOf(GetFavoritesState())
-    val _getMyAdvertisementsState = mutableStateOf(GetMyAdvertisementsState())
-    val _deleteAdvertisementState = mutableStateOf(DeleteAdvertisementState())
-    val _getCitiesState = mutableStateOf(GetCitiesState())
+    private val _addToFavoriteState = mutableStateOf(AddToFavoriteState())
+    private val _deleteFromFavoriteState = mutableStateOf(DeleteFromFavoriteState())
+    private val _addToHistoryState = mutableStateOf(AddToHistoryState())
+    private val _getHistoryState = mutableStateOf(GetHistoryState())
+    private val _getFavoritesState = mutableStateOf(GetFavoritesState())
+    private val _getMyAdvertisementsState = mutableStateOf(GetMyAdvertisementsState())
+    private val _deleteAdvertisementState = mutableStateOf(DeleteAdvertisementState())
+    private val _getCitiesState = mutableStateOf(GetCitiesState())
 
     val getAdvertisementsState: State<GetAdvertisementsState> = _getAdvertisementsState
     val getDetailedAdvertisementState: State<GetDetailedAdvertisementState> =

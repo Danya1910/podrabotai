@@ -200,7 +200,9 @@ private fun Content(
         if (showMessage.value) {
             MessageBox(
                 text = message.value,
-                showError = showMessage,
+                onDismiss = {
+                    showMessage.value = false
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             )

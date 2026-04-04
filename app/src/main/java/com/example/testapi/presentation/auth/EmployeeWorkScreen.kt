@@ -79,6 +79,8 @@ fun EmployeeWorkScreen(
     val isFiltered = remember { mutableStateOf(false) }
     val filterBtnColor = remember { mutableStateOf(White) }
 
+    val filter = viewModel.filter.value
+
     val items = listOf(
         BottomNavItem(
             route = Screen.EmployeeWork.route,
@@ -112,6 +114,8 @@ fun EmployeeWorkScreen(
                         if (isSameScreen && item.isFiltered == true) {
                             viewModel.loadAdvertisements(filter = null)
                             filterBtnColor.value = White
+                            isFiltered.value = false
+                            viewModel.updateFilter(AdvertisementFilter())
                         } else {
                             navController.navigate(item.route) {
                                 launchSingleTop = true
@@ -130,7 +134,8 @@ fun EmployeeWorkScreen(
                     viewModel = viewModel,
                     paddingValues = paddingValues,
                     isFiltered = isFiltered,
-                    filterBtnColor = filterBtnColor
+                    filterBtnColor = filterBtnColor,
+                    filter = filter
                 )
             }
         )
@@ -143,7 +148,8 @@ private fun Content(
     navController: NavController,
     paddingValues: PaddingValues,
     isFiltered: MutableState<Boolean>,
-    filterBtnColor: MutableState<Color>
+    filterBtnColor: MutableState<Color>,
+    filter: AdvertisementFilter
 
 ) {
     val text = remember { mutableStateOf("") }
@@ -153,7 +159,7 @@ private fun Content(
 
     val state = viewModel.getAdvertisementsState.value
 
-    val filter = viewModel.filter.value
+
 
     LaunchedEffect(Unit) {
         viewModel.loadAdvertisements(filter = filter)
@@ -332,7 +338,9 @@ private fun Content(
         if (showMessage.value) {
             MessageBox(
                 text = message.value,
-                showError = showMessage,
+                onDismiss = {
+                    showMessage.value = false
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             )

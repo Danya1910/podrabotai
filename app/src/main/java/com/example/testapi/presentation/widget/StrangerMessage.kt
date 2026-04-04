@@ -29,20 +29,20 @@ import com.example.testapi.ui.theme.White
 @Composable
 @Preview(showBackground = true)
 fun StrangerMessage(
-    text: String = "Скока сделать надо дебил?",
+    text: String = "Скока сделать надо дебил?Скока сделать надо дебил?Скока сделать надо дебил?",
     time: String = "11:11"
 ) {
 
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.padding(end = 40.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.Start
     ) {
 
         Box(
             modifier = Modifier
-                .widthIn(max = screenWidth * 0.7f)
+//                .widthIn(max = screenWidth * 0.7f)
                 .background(
                     color = White,
                     shape = RoundedCornerShape(

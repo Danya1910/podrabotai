@@ -55,6 +55,7 @@ import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.White
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -141,13 +142,8 @@ private fun Content(
     )
 
     val state = viewModel.getChatHistoryState.value
+    val job = state.getChatHistory?.chat?.job
 
-    LaunchedEffect(state.getChatHistory?.chat?.jobId) {
-        state.getChatHistory?.chat?.jobId?.let {
-            adViewModel.loadDetailedAdvertisement(it)
-            Log.d("Chat Debug", viewModel.createChatState.value.createChat?.message ?: "NONE")
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -155,11 +151,20 @@ private fun Content(
             .padding(paddingValues)
             .padding(bottom = 55.dp)
     ) {
-        NameHat(name = state.getChatHistory?.chat?.name ?: "Unknown", navController = navController)
+        NameHat(
+            name = state.getChatHistory?.chat?.penpal?.name ?: "Unknown",
+            navController = navController
+        )
         Spacer(modifier = Modifier.height(15.dp))
-        adViewModel.getDetailedAdvertisementState.value.getDetailedAdvertisement?.let {
-            AdvertisementForChat(ad = it, viewModel = adViewModel)
-        }
+        AdvertisementForChat(
+            address = job?.address ?: "",
+            car = job?.car ?: false,
+            isUrgent = job?.isUrgent ?: false,
+            timeEnd = job?.timeEnd ?: "",
+            timeStart = job?.timeStart ?: "",
+            title = job?.title ?: "",
+            salary = job?.salary ?: 0,
+        )
         val messages = state.getChatHistory?.messages ?: emptyList()
         val listState = rememberLazyListState()
 
@@ -189,7 +194,7 @@ private fun Content(
             val chatItems = generateChatItems(messages)
             LaunchedEffect(chatItems.size) {
                 if (chatItems.isNotEmpty()) {
-                    kotlinx.coroutines.delay(150)
+                    delay(150)
                     listState.animateScrollToItem(chatItems.lastIndex)
                 }
             }

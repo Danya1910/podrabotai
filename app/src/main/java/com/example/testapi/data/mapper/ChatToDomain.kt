@@ -5,8 +5,7 @@ import com.example.testapi.domain.model.Chat
 
 fun ChatDto.toDomain() : Chat {
     return Chat(
-        jobId = job_id,
-        name = name,
-        penpalId = penpal_id
+        job = job.toDomain(),
+        penpal = penpal.toDomain()
     )
 }

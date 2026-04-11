@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -33,8 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.testapi.R
@@ -91,7 +88,7 @@ fun EmployerProfileScreen(
             topBar = {
                 CustomTopAppBar(
                     text = "Профиль",
-                    onClick = {
+                    onLogoutClick = {
                         authViewModel.logout()
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
@@ -135,7 +132,7 @@ private fun Content(
     authViewModel: LoginViewModel
 ) {
 
-    val profile = viewModel.getProfileState.value.getProfile
+    val profile = viewModel.getProfileState.value.profile
 
 
 
@@ -176,7 +173,7 @@ private fun Content(
                 modifier = Modifier.fillMaxHeight()
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_person),
+                    painter = painterResource(R.drawable.ic_avatar),
                     contentDescription = null,
                     tint = Color.Unspecified
                 )

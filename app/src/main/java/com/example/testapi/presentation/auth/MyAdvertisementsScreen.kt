@@ -145,10 +145,13 @@ private fun Content(
 
     LazyColumn(
         modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 30.dp)
-            .padding(top = 50.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = 30.dp,
+            end = 30.dp,
+            bottom = 80.dp
+        )
     ) {
 
         item {
@@ -178,7 +181,7 @@ private fun Content(
             }
 
             state.isSuccessful -> {
-                items(state.myAdvertisements) { ad ->
+                items(state.myAds) { ad ->
                     OwnAdvertisement(
                         ad,
                         navController = navController,

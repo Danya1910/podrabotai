@@ -69,7 +69,7 @@ fun EmployeeChatsScreen(
 
     val items = listOf(
         BottomNavItem(route = Screen.EmployeeWork.route, icon = R.drawable.ic_work),
-        BottomNavItem(route = Screen.History.route, icon = R.drawable.ic_navigation_heart),
+        BottomNavItem(route = Screen.Favorites.route, icon = R.drawable.ic_navigation_heart),
         BottomNavItem(route = Screen.EmployeeChats.route, icon = R.drawable.ic_message),
         BottomNavItem(route = Screen.EmployeeProfile.route, icon = R.drawable.ic_profile)
     )
@@ -154,7 +154,7 @@ private fun Content(
         }
     }
 
-    if(state.getChats.isNullOrEmpty()) {
+    if(state.chats.isNullOrEmpty()) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -206,7 +206,7 @@ private fun Content(
             }
         }
 
-        state.getChats?.let { chats ->
+        state.chats?.let { chats ->
             items(chats) { chat ->
                 Chat(chat = chat, navController = navController)
                 Spacer(modifier = Modifier.height(5.dp))

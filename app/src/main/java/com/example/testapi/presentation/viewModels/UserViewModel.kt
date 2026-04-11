@@ -30,7 +30,7 @@ class UserViewModel @Inject constructor(
                 _getProfileState.value = _getProfileState.value.copy(
                     isLoading = false,
                     isSuccessful = true,
-                    getProfile = getProfileUseCase()
+                    profile = getProfileUseCase()
                 )
             } catch (e: Exception) {
                 _getProfileState.value = _getProfileState.value.copy(

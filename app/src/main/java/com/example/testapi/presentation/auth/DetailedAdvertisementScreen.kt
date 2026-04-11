@@ -1,13 +1,11 @@
 package com.example.testapi.presentation.auth
 
-import android.R.attr.padding
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,29 +30,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.testapi.R
 import com.example.testapi.domain.model.BottomNavItem
-import com.example.testapi.domain.model.DetailedAdvertisement
 import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.widget.CustomBottomBar
-import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.presentation.widget.CustomTopAppBarForDetailed
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.White
-import java.time.LocalTime
-import kotlin.time.Duration
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -125,7 +116,7 @@ private fun Content(
     paddingValues: PaddingValues,
 ) {
 
-    val ad = viewModel.getDetailedAdvertisementState.value.getDetailedAdvertisement
+    val ad = viewModel.getDetailedAdvertisementState.value.detailedAd
 
     LaunchedEffect(jobId) {
         viewModel.loadDetailedAdvertisement(jobId = jobId)
@@ -242,7 +233,7 @@ private fun Content(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
+                        painter = painterResource(id = R.drawable.ic_avatar),
                         contentDescription = null,
                         tint = Color.Unspecified
                     )

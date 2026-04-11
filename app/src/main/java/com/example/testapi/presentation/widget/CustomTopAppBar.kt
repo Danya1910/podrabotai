@@ -1,6 +1,5 @@
 package com.example.testapi.presentation.widget
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +27,8 @@ import com.example.testapi.ui.theme.White
 @Composable
 fun CustomTopAppBar(
     text: String,
-    onClick: (() -> Unit)? = null
+    onLogoutClick: (() -> Unit)? = null,
+    onHistoryClick: (() -> Unit)? = null,
 ) {
     TopAppBar(
         title = {
@@ -49,10 +49,20 @@ fun CustomTopAppBar(
                 Spacer(modifier = Modifier.width(8.dp))
             }
         },
-        navigationIcon = {},
+        navigationIcon = {
+            if(onHistoryClick != null) {
+                IconButton(onClick = onHistoryClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_history),
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        },
         actions = {
-            if(onClick != null) {
-                IconButton(onClick = onClick) {
+            if(onLogoutClick != null) {
+                IconButton(onClick = onLogoutClick) {
                     Icon(
                         painter = painterResource(R.drawable.ic_logout),
                         contentDescription = null,

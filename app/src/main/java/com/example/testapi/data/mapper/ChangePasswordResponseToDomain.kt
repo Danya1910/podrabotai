@@ -6,7 +6,7 @@ import com.example.testapi.domain.model.ChangePasswordResponse
 fun ChangePasswordResponseDto.toDomain() : ChangePasswordResponse {
     return ChangePasswordResponse(
         message = message,
-        access_token = access_token,
+        accessToken = access_token,
         role = role
     )
 }

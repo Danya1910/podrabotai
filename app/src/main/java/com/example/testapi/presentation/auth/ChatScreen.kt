@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +48,7 @@ import com.example.testapi.domain.model.Message
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.viewModels.ChatViewModel
 import com.example.testapi.presentation.widget.AdvertisementForChat
+import com.example.testapi.presentation.widget.CustomTextButton
 import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.presentation.widget.MineMessage
 import com.example.testapi.presentation.widget.StrangerMessage
@@ -108,6 +110,7 @@ private fun Content(
 ) {
 
     LaunchedEffect(penpalId, jobId) {
+        viewModel.setCurrentPenpal(penpalId = penpalId)
         if (jobId != -1) {
             viewModel.createChat(penpalId, jobId)
             Log.d("Chat Debug", "CreateChat called from ChatScreen")
@@ -120,6 +123,7 @@ private fun Content(
 
 
     val createState = viewModel.createChatState.value
+    val warming = remember { mutableStateOf(false) }
 
     LaunchedEffect(createState.error == "HTTP 406 NOT ACCEPTABLE") {
         if (createState.error == "HTTP 406 NOT ACCEPTABLE") {
@@ -129,10 +133,14 @@ private fun Content(
     }
 
     LaunchedEffect(viewModel.getChatHistoryState.value.error) {
-        Log.d(
-            "ChatDebug",
-            "getChatHistoryState error: ${viewModel.getChatHistoryState.value.error}"
-        )
+        if (viewModel.getChatHistoryState.value.error == "HTTP 404 NOT FOUND") {
+            Log.d(
+                "ChatDebug",
+                "getChatHistoryState error: ${viewModel.getChatHistoryState.value.error}"
+            )
+            warming.value = true
+        }
+
     }
 
 
@@ -142,7 +150,7 @@ private fun Content(
     )
 
     val state = viewModel.getChatHistoryState.value
-    val job = state.getChatHistory?.chat?.job
+    val job = state.chatHistory?.chat?.job
 
 
     Column(
@@ -150,9 +158,10 @@ private fun Content(
             .fillMaxSize()
             .padding(paddingValues)
             .padding(bottom = 55.dp)
+            .background(if (warming.value) Color.Black.copy(alpha = 0.3f) else Color.Transparent)
     ) {
         NameHat(
-            name = state.getChatHistory?.chat?.penpal?.name ?: "Unknown",
+            name = state.chatHistory?.chat?.penpal?.name ?: "Unknown",
             navController = navController
         )
         Spacer(modifier = Modifier.height(15.dp))
@@ -165,74 +174,79 @@ private fun Content(
             title = job?.title ?: "",
             salary = job?.salary ?: 0,
         )
-        val messages = state.getChatHistory?.messages ?: emptyList()
+        val messages = state.chatHistory?.messages ?: emptyList()
         val listState = rememberLazyListState()
 
-        if (messages.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Сообщений пока нет",
-                    color = SupportText,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = Inter
-                )
-            }
-        } else if (viewModel.getChatsState.value.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        if (warming.value) {
+            Warming(navController = navController)
         } else {
-            val chatItems = generateChatItems(messages)
-            LaunchedEffect(chatItems.size) {
-                if (chatItems.isNotEmpty()) {
-                    delay(150)
-                    listState.animateScrollToItem(chatItems.lastIndex)
-                }
-            }
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 10.dp)
-            ) {
-                items(chatItems) { item ->
-                    when (item) {
-                        is ChatItem.DateSeparator -> {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(24.dp)
-                            ) {
-                                DateInfo(date = item.date)
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
+            if (messages.isEmpty()) {
 
-                        is ChatItem.MessageItem -> {
-                            val message = item.message
-                            if (message.senderId != penpalId) {
-                                MineMessage(
-                                    text = message.text,
-                                    time = formatChatTime(message.createdAt)
-                                )
-                            } else {
-                                StrangerMessage(
-                                    text = message.text,
-                                    time = formatChatTime(message.createdAt)
-                                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Сообщений пока нет",
+                        color = SupportText,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = Inter
+                    )
+                }
+            } else if (viewModel.getChatsState.value.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                val chatItems = generateChatItems(messages)
+                LaunchedEffect(chatItems.size) {
+                    if (chatItems.isNotEmpty()) {
+                        delay(150)
+                        listState.animateScrollToItem(chatItems.lastIndex)
+                    }
+                }
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 10.dp)
+                ) {
+                    items(chatItems) { item ->
+                        when (item) {
+                            is ChatItem.DateSeparator -> {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(24.dp)
+                                ) {
+                                    DateInfo(date = item.date)
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
                             }
-                            Spacer(modifier = Modifier.height(10.dp))
+
+                            is ChatItem.MessageItem -> {
+                                val message = item.message
+                                if (message.senderId != penpalId) {
+                                    MineMessage(
+                                        text = message.text,
+                                        time = formatChatTime(message.createdAt)
+                                    )
+                                } else {
+                                    StrangerMessage(
+                                        text = message.text,
+                                        time = formatChatTime(message.createdAt)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
                         }
                     }
                 }
@@ -364,7 +378,7 @@ private fun NameHat(
             )
             Spacer(modifier = Modifier.weight(1f))
             Icon(
-                painter = painterResource(R.drawable.ic_person),
+                painter = painterResource(R.drawable.ic_avatar),
                 contentDescription = null,
                 tint = Color.Unspecified
             )
@@ -507,4 +521,47 @@ fun generateChatItems(messages: List<Message>): List<ChatItem> {
         items.add(ChatItem.MessageItem(msg))
     }
     return items
+}
+
+@Composable
+private fun Warming(
+    navController: NavController
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(horizontal = 30.dp)
+                .height(100.dp)
+                .fillMaxWidth()
+                .background(color = Color.White, shape = RoundedCornerShape(32.dp))
+        ) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(all = 15.dp)
+            ) {
+                Text(
+                    text = "Это ваше объявление",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Inter,
+                    color = Color.Black
+                )
+                CustomTextButton(
+                    text = "Ок",
+                    color = Blue,
+                    onClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+    }
 }

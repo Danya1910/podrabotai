@@ -74,46 +74,50 @@ fun FavoritesAdvertisementsScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(R.drawable.background),
-            contentDescription = null,
-            modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.Crop
-        )
 
-        Scaffold(
-            topBar = {
-                CustomTopAppBar(
-                    text = "Избранные",
-                )
-            },
-            containerColor = Color.Transparent,
-            bottomBar = {
-                CustomBottomBar(
-                    items = items,
-                    currentRoute = currentRoute,
-                    onItemClick = { item ->
-                        navController.navigate(item.route) {
-                            launchSingleTop = true
-                            restoreState = true
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
+
+    Scaffold(
+        topBar = {
+            CustomTopAppBar(
+                text = "Избранные",
+            )
+        },
+        containerColor = Color.Transparent,
+        bottomBar = {
+            CustomBottomBar(
+                items = items,
+                currentRoute = currentRoute,
+                onItemClick = { item ->
+                    navController.navigate(item.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
                         }
                     }
-                )
-            },
+                }
+            )
+        }) { innerPadding ->
 
-            content = { paddingValues ->
-                Content(
-                    paddingValues = paddingValues,
-                    navController = navController,
-                    viewModel = viewModel
-                )
-            }
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Image(
+                painter = painterResource(R.drawable.background),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            Content(
+                paddingValues = innerPadding,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
     }
+
 }
 
 @Composable
@@ -124,7 +128,7 @@ private fun Content(
 ) {
 
     val message = remember { mutableStateOf("") }
-    val showMessage = remember { mutableStateOf(false) }
+    val activeMessageAdId = remember { mutableStateOf<Int?>(null) }
 
     val state = viewModel.getFavoritesState.value
 
@@ -159,10 +163,13 @@ private fun Content(
 
     LazyColumn(
         modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 30.dp)
-            .padding(top = 50.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = 30.dp,
+            end = 30.dp,
+            bottom = 80.dp
+        )
     ) {
         when {
 
@@ -182,28 +189,11 @@ private fun Content(
                         navController = navController,
                         viewModel = viewModel,
                         message = message,
-                        showMessage = showMessage
+                        activeMessageAdId = activeMessageAdId
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
-        }
-    }
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 30.dp, vertical = 90.dp)
-    ) {
-        if (showMessage.value) {
-            MessageBox(
-                text = message.value,
-                onDismiss = {
-                    showMessage.value = false
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
         }
     }
 }

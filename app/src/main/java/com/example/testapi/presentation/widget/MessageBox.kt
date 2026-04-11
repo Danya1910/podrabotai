@@ -28,7 +28,8 @@ fun MessageBox(
     Box(
         modifier = modifier
             .background(
-                color = TransparentWhite,
+                //color = TransparentWhite,
+                color = Color.Black.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(32.dp)
             )
             .border(
@@ -44,7 +45,7 @@ fun MessageBox(
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             letterSpacing = 1.sp,
-            color = Color.Black
+            color = Color.White
         )
     }
 

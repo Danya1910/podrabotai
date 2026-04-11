@@ -5,6 +5,6 @@ import com.example.testapi.domain.model.DetailedAdvertisement
 data class GetDetailedAdvertisementState(
     val isLoading: Boolean = false,
     val isSuccessful: Boolean = false,
-    val getDetailedAdvertisement: DetailedAdvertisement? = null,
+    val detailedAd: DetailedAdvertisement? = null,
     val error: String? = null
 )

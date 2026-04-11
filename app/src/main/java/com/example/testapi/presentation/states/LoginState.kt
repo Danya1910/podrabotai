@@ -6,7 +6,6 @@ import com.example.testapi.domain.model.LoginResponse
 data class LoginState(
     val isLoading: Boolean = false,
     val isSuccessful: Boolean = false,
-    val posts: List<LoginResponse> = emptyList(),
     val login: LoginResponse? = null,
     val error: String? = null,
 )

@@ -2,15 +2,14 @@ package com.example.testapi.presentation.auth
 
 import android.os.Build
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,11 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -40,16 +37,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -76,6 +68,7 @@ fun EmployeeWorkScreen(
     viewModel: AdvertisementViewModel,
     navController: NavController,
 ) {
+    BackHandler(enabled = true) {}
     val isFiltered = remember { mutableStateOf(false) }
     val filterBtnColor = remember { mutableStateOf(White) }
 
@@ -155,7 +148,7 @@ private fun Content(
     val text = remember { mutableStateOf("") }
 
     val message = remember { mutableStateOf("") }
-    val showMessage = remember { mutableStateOf(false) }
+    val activeMessageAdId = remember { mutableStateOf<Int?>(null) }
 
     val state = viewModel.getAdvertisementsState.value
 
@@ -205,9 +198,13 @@ private fun Content(
 
     LazyColumn(
         modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 30.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = 30.dp,
+            end = 30.dp,
+            bottom = 80.dp
+        )
     ) {
 
         item {
@@ -264,7 +261,7 @@ private fun Content(
                         )
                         Spacer(modifier = Modifier.width(7.dp))
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_person),
+                            painter = painterResource(id = R.drawable.ic_avatar),
                             contentDescription = null,
                             tint = Color.Unspecified
                         )
@@ -316,34 +313,17 @@ private fun Content(
             }
 
             state.isSuccessful -> {
-                items(state.getAdvertisements) { ad ->
+                items(state.ads) { ad ->
                     Advertisement(
-                        ad,
+                        ad = ad,
                         navController = navController,
                         viewModel = viewModel,
                         message = message,
-                        showMessage = showMessage
+                        activeMessageAdId = activeMessageAdId
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
-        }
-    }
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 30.dp, vertical = 90.dp)
-    ) {
-        if (showMessage.value) {
-            MessageBox(
-                text = message.value,
-                onDismiss = {
-                    showMessage.value = false
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
         }
     }
 }

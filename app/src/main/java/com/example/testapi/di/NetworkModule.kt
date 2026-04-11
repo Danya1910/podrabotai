@@ -2,6 +2,7 @@ package com.example.testapi.di
 
 import com.example.testapi.data.network.AuthInterceptor
 import com.example.testapi.data.api.PostApi
+import com.example.testapi.data.socket.SocketManager
 import com.example.testapi.domain.repository.LocalDataSourceRepository
 import dagger.Module
 import dagger.Provides
@@ -48,4 +49,8 @@ object NetworkModule {
     fun provideApi(retrofit: Retrofit): PostApi {
         return retrofit.create(PostApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideSocketManager(): SocketManager = SocketManager()
 }

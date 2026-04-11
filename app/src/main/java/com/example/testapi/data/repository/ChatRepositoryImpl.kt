@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.testapi.data.api.PostApi
 import com.example.testapi.data.mapper.toCreateDto
 import com.example.testapi.data.mapper.toDomain
+import com.example.testapi.data.socket.SocketManager
 import com.example.testapi.domain.model.ChatMessages
 import com.example.testapi.domain.model.CreateChatRequest
 import com.example.testapi.domain.model.CreateChatResponse
@@ -12,10 +13,15 @@ import com.example.testapi.domain.model.SendMessageRequest
 import com.example.testapi.domain.model.SendMessageResponse
 import com.example.testapi.domain.repository.AdvertisementRepository
 import com.example.testapi.domain.repository.ChatRepository
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
-    private val api: PostApi
+    private val api: PostApi,
+    private val socketManager: SocketManager,
 ) : ChatRepository {
 
     override suspend fun getChats(): List<GetChatsResponse> {
@@ -38,4 +44,9 @@ class ChatRepositoryImpl @Inject constructor(
         Log.d("REPO_DEBUG", "sendMessage called")
         return api.sendMessage(penpalId = penpalId, request = request.toCreateDto()).toDomain()
     }
+
+    override fun observePing(): Flow<Int> {
+        return socketManager.pingFlow
+    }
+
 }

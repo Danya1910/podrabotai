@@ -53,7 +53,6 @@ import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.ChatBlue
 import com.example.testapi.ui.theme.Inter
-import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.White
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -150,7 +149,7 @@ private fun Content(
         }
     }
 
-    if(state.getChats.isNullOrEmpty()) {
+    if(state.chats.isNullOrEmpty()) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -194,7 +193,7 @@ private fun Content(
             }
         }
 
-        state.getChats?.let { chats ->
+        state.chats?.let { chats ->
             items(chats) { chat ->
                 Chat(chat = chat, navController = navController)
                 Spacer(modifier = Modifier.height(10.dp))

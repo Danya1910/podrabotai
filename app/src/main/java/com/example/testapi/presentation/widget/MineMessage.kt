@@ -40,16 +40,14 @@ fun MineMessage(
     time: String,
 ) {
 
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.padding(start = 40.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
 
         Box(
             modifier = Modifier
-                .widthIn(max = screenWidth * 0.7f)
                 .background(
                     color = LightBlueForMessage,
                     shape = RoundedCornerShape(

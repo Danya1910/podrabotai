@@ -1,6 +1,7 @@
 package com.example.testapi.presentation.auth
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -91,6 +92,7 @@ private fun Content(
     navController: NavController,
     paddingValues: PaddingValues,
 ) {
+    BackHandler(enabled = true) {}
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
 

@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.testapi.data.mapper.toCreateDto
+import com.example.testapi.data.socket.SocketManager
 import com.example.testapi.domain.model.RecoveryCodeRequest
 import com.example.testapi.domain.model.UserData
 import com.example.testapi.domain.repository.LocalDataSourceRepository
@@ -49,7 +50,8 @@ class LoginViewModel @Inject constructor(
     private val changePasswordUseCase: ChangePasswordUseCase,
     private val changeRoleUseCase: ChangeRoleUseCase,
     private val logoutUseCase: LogoutUseCase,
-    val localRepository: LocalDataSourceRepository
+    val localRepository: LocalDataSourceRepository,
+    private val socketManager: SocketManager,
 ) : ViewModel() {
     private val _state = mutableStateOf(LoginState())
     private val _registerState = mutableStateOf(RegisterState())
@@ -77,11 +79,6 @@ class LoginViewModel @Inject constructor(
     }
 
     fun getUserData(): UserData? = localRepository.getData()
-
-
-    init {
-        loadPosts()
-    }
 
     fun register(userName: String, email: String, password: String, role: String) {
         viewModelScope.launch {
@@ -126,6 +123,7 @@ class LoginViewModel @Inject constructor(
                 saveTokenUseCase(response.accessToken)
                 token = getTokenUseCase()
                 code = emailCode
+                socketManager.connect(token = response.accessToken)
                 Log.d("LoginViewModel", "Token saved(confirmMail): ${response.accessToken}")
                 _confirmMailState.value = _confirmMailState.value.copy(
                     confirmMail = response,
@@ -211,29 +209,13 @@ class LoginViewModel @Inject constructor(
                     recoveryPassword = response,
                     isLoading = false
                 )
+                socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
                 _recoveryPasswordState.value = _recoveryPasswordState.value.copy(
                     error = e.message,
                     isLoading = false
                 )
             }
-        }
-    }
-
-
-    private fun loadPosts() {
-        viewModelScope.launch {
-            _state.value = LoginState(isLoading = true)
-            try {
-                val posts = getPostsUseCase()
-                _state.value = LoginState(posts = posts)
-            } catch (e: Exception) {
-                _state.value = LoginState(
-                    error = e.message,
-                    isLoading = false
-                )
-            }
-
         }
     }
 
@@ -253,6 +235,7 @@ class LoginViewModel @Inject constructor(
                     isSuccessful = true,
                     isLoading = false
                 )
+                socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     error = e.message,
@@ -272,13 +255,14 @@ class LoginViewModel @Inject constructor(
                     old_password = old_password,
                     new_password = new_password
                 )
-                saveTokenUseCase(response.access_token)
-                Log.d("LoginViewModel", "Token saved(change_password): ${response.access_token}")
+                saveTokenUseCase(response.accessToken)
+                Log.d("LoginViewModel", "Token saved(change_password): ${response.accessToken}")
                 _changePasswordState.value = _changePasswordState.value.copy(
                     isLoading = false,
                     isSuccessful = true,
                     changePassword = response
                 )
+                socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
                 _changePasswordState.value = _changePasswordState.value.copy(
                     isLoading = false,

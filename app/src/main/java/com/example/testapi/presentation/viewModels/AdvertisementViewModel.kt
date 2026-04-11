@@ -3,14 +3,9 @@ package com.example.testapi.presentation.viewModels
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.testapi.data.local.TokenStore
 import com.example.testapi.domain.model.AdvertisementFilter
-import com.example.testapi.domain.model.CreateAdvertisementRequest
-import com.example.testapi.domain.model.DetailedAdvertisement
 import com.example.testapi.domain.usecase.AddToFavoriteUseCase
 import com.example.testapi.domain.usecase.AddToHistoryUseCase
 import com.example.testapi.domain.usecase.CreateAdvertisementUseCase
@@ -35,13 +30,8 @@ import com.example.testapi.presentation.states.GetDetailedAdvertisementState
 import com.example.testapi.presentation.states.GetFavoritesState
 import com.example.testapi.presentation.states.GetHistoryState
 import com.example.testapi.presentation.states.GetMyAdvertisementsState
-import com.example.testapi.presentation.states.RegisterState
 import com.example.testapi.presentation.states.UpdateAdvertisementState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hilt_aggregated_deps._com_example_testapi_di_AdvertisementModule
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -109,7 +99,7 @@ class AdvertisementViewModel @Inject constructor(
             Log.d("Test Token Ad", "$token")
             try {
                 _getAdvertisementsState.value = _getAdvertisementsState.value.copy(
-                    getAdvertisements = getAdvertisementsUseCase(
+                    ads = getAdvertisementsUseCase(
                         filter = filter
                     ),
                     isLoading = false,
@@ -117,7 +107,7 @@ class AdvertisementViewModel @Inject constructor(
                 )
                 Log.d(
                     "API_DEBUG",
-                    "Ads count = ${_getAdvertisementsState.value.getAdvertisements.size}"
+                    "Ads count = ${_getAdvertisementsState.value.ads.size}"
                 )
             } catch (e: Exception) {
                 _getAdvertisementsState.value = _getAdvertisementsState.value.copy(
@@ -141,13 +131,13 @@ class AdvertisementViewModel @Inject constructor(
                 val ad = getDetailedAdvertisementUseCase(jobId)
                 _getDetailedAdvertisementState.value =
                     _getDetailedAdvertisementState.value.copy(
-                        getDetailedAdvertisement = ad,
+                        detailedAd = ad,
                         isLoading = false,
                         isSuccessful = true,
                     )
                 Log.d(
                     "DetailedAdvertisement",
-                    "Detailed Ad= ${_getDetailedAdvertisementState.value.getDetailedAdvertisement}"
+                    "Detailed Ad= ${_getDetailedAdvertisementState.value.detailedAd}"
                 )
                 _addToFavoriteState.value =
                     _addToFavoriteState.value.copy(isSuccessful = ad.isFavorite)
@@ -283,11 +273,11 @@ class AdvertisementViewModel @Inject constructor(
                 _getHistoryState.value = _getHistoryState.value.copy(
                     isLoading = false,
                     isSuccessful = true,
-                    getHistory = getHistoryUseCase()
+                    history = getHistoryUseCase()
                 )
                 Log.d(
                     "GetHistory",
-                    "History Ads= ${_getHistoryState.value.getHistory}"
+                    "History Ads= ${_getHistoryState.value.history}"
                 )
             } catch (e: Exception) {
                 _getHistoryState.value = _getHistoryState.value.copy(
@@ -300,7 +290,7 @@ class AdvertisementViewModel @Inject constructor(
 
     fun toggleFavorite(jobId: Int) {
 
-        val list = _getAdvertisementsState.value.getAdvertisements.toMutableList()
+        val list = _getAdvertisementsState.value.ads.toMutableList()
 
         val index = list.indexOfFirst { it.id == jobId }
 
@@ -310,12 +300,32 @@ class AdvertisementViewModel @Inject constructor(
             list[index] = ad.copy(
                 isFavorite = !ad.isFavorite
             )
+
         }
 
         _getAdvertisementsState.value =
             _getAdvertisementsState.value.copy(
-                getAdvertisements = list
+                ads = list
             )
+
+    }
+
+    fun toggleHistoryFavorite(jobId: Int) {
+
+        val historyList = _getHistoryState.value.history.toMutableList()
+
+        val historyIndex = historyList.indexOfFirst { it.id == jobId }
+
+        if (historyIndex != -1) {
+            val historyAd = historyList[historyIndex]
+
+            historyList[historyIndex] = historyAd.copy(
+                isFavorite = !historyAd.isFavorite
+            )
+        }
+        _getHistoryState.value = _getHistoryState.value.copy(
+            history = historyList
+        )
     }
 
     fun createAdvertisement(
@@ -340,7 +350,7 @@ class AdvertisementViewModel @Inject constructor(
             )
             try {
                 _createAdvertisementState.value = _createAdvertisementState.value.copy(
-                    createAdvertisement = createAdvertisementUseCase(
+                    createAd = createAdvertisementUseCase(
                         title = title,
                         wantedJob = wantedJob,
                         description = description,
@@ -361,7 +371,7 @@ class AdvertisementViewModel @Inject constructor(
                 )
                 Log.d(
                     "CreateAdvertisement",
-                    "Create Ad= ${_createAdvertisementState.value.createAdvertisement}"
+                    "Create Ad= ${_createAdvertisementState.value.createAd}"
                 )
             } catch (e: Exception) {
                 _createAdvertisementState.value = _createAdvertisementState.value.copy(
@@ -401,7 +411,7 @@ class AdvertisementViewModel @Inject constructor(
                 _updateAdvertisementState.value = _updateAdvertisementState.value.copy(
                     isLoading = false,
                     isSuccessful = true,
-                    update = updateAdvertisementUseCase(
+                    updateAd = updateAdvertisementUseCase(
                         title = title,
                         wantedJob = wantedJob,
                         description = description,
@@ -456,13 +466,13 @@ class AdvertisementViewModel @Inject constructor(
             _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(isLoading = true)
             try {
                 _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(
-                    myAdvertisements = getMyAdvertisementsUseCase(),
+                    myAds = getMyAdvertisementsUseCase(),
                     isLoading = false,
                     isSuccessful = true,
                 )
                 Log.d(
                     "API_DEBUG",
-                    "Ads count = ${_getMyAdvertisementsState.value.myAdvertisements.size}"
+                    "Ads count = ${_getMyAdvertisementsState.value.myAds.size}"
                 )
             } catch (e: Exception) {
                 _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(

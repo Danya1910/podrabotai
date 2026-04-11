@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.foundation.layout)
+    implementation(libs.volley)
     kapt("com.google.dagger:hilt-compiler:2.52")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
@@ -73,6 +74,11 @@ dependencies {
 
     implementation("androidx.compose.material:material:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    implementation("io.socket:socket.io-client:2.1.0") {
+        exclude(group = "org.json", module = "json")
+    }
+
 
 
     implementation(libs.androidx.core.ktx)

@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.example.testapi.R
 import com.example.testapi.domain.model.Advertisement
+import com.example.testapi.presentation.navigation.Screen
+import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Grey
 import com.example.testapi.ui.theme.GreyForCorner
@@ -45,11 +50,14 @@ import com.example.testapi.ui.theme.White
 import com.example.testapi.ui.theme.Yellow
 
 @Composable
-fun AdvertisementForEmployer(
+fun AdvertisementHistory(
     ad: Advertisement,
+    viewModel: AdvertisementViewModel? = null,
+    navController: NavController,
     message: MutableState<String>? = null,
     activeMessageAdId: MutableState<Int?>? = null,
 ) {
+
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -73,7 +81,7 @@ fun AdvertisementForEmployer(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_avatar),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -89,8 +97,10 @@ fun AdvertisementForEmployer(
                     IconsRow(
                         isUrgent = ad.isUrgent,
                         car = ad.car,
+                        ad = ad,
                         message = message,
                         activeMessageAdId = activeMessageAdId,
+                        viewModel = viewModel,
                         jobId = ad.id
                     )
                 }
@@ -105,7 +115,9 @@ fun AdvertisementForEmployer(
                 Spacer(modifier = Modifier.height(8.dp))
                 InfoFields(
                     address = ad.address,
-                    time = calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                    time = remember(ad.timeStart, ad.timeEnd) {
+                        calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                    }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -116,6 +128,11 @@ fun AdvertisementForEmployer(
                     color = SupportText
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+                CommunicateButtons(
+                    navController = navController,
+                    jobId = ad.id,
+                    penpalId = ad.user.id
+                )
             }
         }
         if (activeMessageAdId?.value == ad.id) {
@@ -146,11 +163,23 @@ fun AdvertisementForEmployer(
 private fun IconsRow(
     isUrgent: Boolean,
     car: Boolean,
+    ad: Advertisement,
     message: MutableState<String>? = null,
     activeMessageAdId: MutableState<Int?>? = null,
-    jobId: Int? = null,
+    viewModel: AdvertisementViewModel? = null,
+    jobId: Int? = null
 ) {
+    val addState = viewModel?.addToFavoriteState?.value
+    val deleteState = viewModel?.deleteFromFavoriteState?.value
+    val isFavorite = ad.isFavorite
 
+    val favIcon = if (isFavorite) {
+        R.drawable.ic_fill_heart
+    } else {
+        R.drawable.ic_stroke_heart
+    }
+
+    val id = jobId ?: 0
 
     Row(
         modifier = Modifier
@@ -173,6 +202,18 @@ private fun IconsRow(
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
+        CircleIcon(
+            route = favIcon, color = Color.Unspecified, onClick = {
+                if (addState?.isLoading != true && deleteState?.isLoading != true) {
+                    if (isFavorite) {
+                        viewModel?.deleteFromFavorite(id)
+                    } else {
+                        viewModel?.addToFavorite(id)
+                    }
+                    viewModel?.toggleHistoryFavorite(id)
+                }
+            }
+        )
     }
 
 }
@@ -260,6 +301,99 @@ private fun InfoFields(
                 fontFamily = Inter,
                 fontSize = 15.sp,
                 color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun CommunicateButtons(
+    navController: NavController,
+    penpalId: Int,
+    jobId: Int
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(0.5f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(30.dp))
+                .border(
+                    width = 1.dp,
+                    color = Blue,
+                    shape = RoundedCornerShape(30.dp)
+                )
+                .clickable {
+                    navController.navigate(
+                        Screen.Chat.passArgs(
+                            penpalId = penpalId,
+                            jobId = jobId
+                        )
+                    )
+                }
+                .background(Color.White)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_chat),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(9.dp))
+        Box(
+            modifier = Modifier
+                .weight(0.5f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(30.dp))
+                .border(
+                    width = 1.dp,
+                    color = Blue,
+                    shape = RoundedCornerShape(30.dp)
+                )
+                .background(Color.White)
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_phone),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(9.dp))
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(30.dp))
+                .border(
+                    width = 1.dp,
+                    color = Blue,
+                    shape = RoundedCornerShape(30.dp)
+                )
+                .background(Blue)
+                //.clickable{navController.navigate(Screen.CreateAdvertisement.route)}
+                .clickable { navController.navigate(Screen.DetailedAdvertisement.passJobId(jobId = jobId)) }
+                //.clickable { navController.navigate(Screen.Chats.route) }
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Подробнее",
+                fontWeight = FontWeight.Normal,
+                fontFamily = Inter,
+                fontSize = 15.sp,
+                color = White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

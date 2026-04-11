@@ -53,74 +53,103 @@ fun AdvertisementFavoritesScreen(
     viewModel: AdvertisementViewModel? = null,
     navController: NavController,
     message: MutableState<String>? = null,
-    showMessage: MutableState<Boolean>? = null
+    activeMessageAdId: MutableState<Int?>? = null,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = White
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                    .fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_person),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_avatar),
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = ad.user.userName,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter,
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconsRow(
+                        isUrgent = ad.isUrgent,
+                        car = ad.car,
+                        ad = ad,
+                        message = message,
+                        activeMessageAdId = activeMessageAdId,
+                        viewModel = viewModel,
+                        jobId = ad.id
+                    )
+                }
+                Spacer(modifier = Modifier.height(15.dp))
                 Text(
-                    text = ad.user.userName,
+                    text = ad.title,
                     fontWeight = FontWeight.Normal,
                     fontFamily = Inter,
                     fontSize = 16.sp,
-                    color = Color.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    color = Color.Black
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                IconsRow(
-                    isUrgent = ad.isUrgent,
-                    car = ad.car,
-                    ad = ad,
-                    message = message,
-                    showMessage = showMessage,
-                    viewModel = viewModel,
-                    jobId = ad.id
+                Spacer(modifier = Modifier.height(8.dp))
+                InfoFields(
+                    address = ad.address,
+                    time = calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = ad.salary.toString(),
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = Inter,
+                    fontSize = 16.sp,
+                    color = SupportText
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CommunicateButtons(
+                    navController = navController,
+                    jobId = ad.id,
+                    penpalId = ad.user.id
                 )
             }
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(
-                text = ad.title,
-                fontWeight = FontWeight.Normal,
-                fontFamily = Inter,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            InfoFields(
-                address = ad.address,
-                time = calculateWorkHours(timeStart = ad.timeStart, timeEnd = ad.timeEnd)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = ad.salary.toString(),
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = Inter,
-                fontSize = 16.sp,
-                color = SupportText
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            CommunicateButtons(navController = navController, jobId = ad.id, penpalId = ad.user.id)
+        }
+        if (activeMessageAdId?.value == ad.id) {
+
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .matchParentSize()
+                    .padding(top = 13.dp)
+                    .padding(horizontal = 20.dp),
+            ) {
+
+                MessageBox(
+                    text = message?.value ?: "",
+                    onDismiss = {
+                        activeMessageAdId.value = null
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 43.dp)
+                )
+            }
         }
     }
 }
@@ -131,7 +160,7 @@ private fun IconsRow(
     car: Boolean,
     ad: Advertisement,
     message: MutableState<String>? = null,
-    showMessage: MutableState<Boolean>? = null,
+    activeMessageAdId: MutableState<Int?>? = null,
     viewModel: AdvertisementViewModel? = null,
     jobId: Int? = null
 ) {
@@ -155,7 +184,7 @@ private fun IconsRow(
             CircleIcon(
                 route = R.drawable.ic_lightning, color = Yellow, onClick = {
                     message?.value = "Срочное объявление"
-                    showMessage?.value = true
+                    activeMessageAdId?.value = jobId
                 }
             )
         if (car) {
@@ -163,7 +192,7 @@ private fun IconsRow(
             CircleIcon(
                 route = R.drawable.ic_car, color = Grey, onClick = {
                     message?.value = "Нужен автомобиль"
-                    showMessage?.value = true
+                    activeMessageAdId?.value = jobId
                 }
             )
         }

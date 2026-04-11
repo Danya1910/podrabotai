@@ -33,7 +33,6 @@ fun StrangerMessage(
     time: String = "11:11"
 ) {
 
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Row(
         modifier = Modifier.padding(end = 40.dp).fillMaxWidth(),
@@ -42,7 +41,6 @@ fun StrangerMessage(
 
         Box(
             modifier = Modifier
-//                .widthIn(max = screenWidth * 0.7f)
                 .background(
                     color = White,
                     shape = RoundedCornerShape(

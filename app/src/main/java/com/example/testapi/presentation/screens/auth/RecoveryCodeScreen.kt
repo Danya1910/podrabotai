@@ -1,6 +1,7 @@
-package com.example.testapi.presentation.auth
+package com.example.testapi.presentation.screens.auth
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,12 +22,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -38,32 +38,33 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.testapi.R
-import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.LoginViewModel
+import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.widget.CustomTextButton
+import com.example.testapi.presentation.widget.MessageBox
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
-import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.TransparentWhite
 import com.example.testapi.ui.theme.White
 
 @Composable
-fun ConfirmEmailScreen(
+fun RecoveryCodeScreen(
     viewModel: LoginViewModel,
     navController: NavController
 ) {
+    BackHandler {
+        navController.popBackStack()
+    }
     Box(modifier = Modifier.fillMaxSize()) { // фон на весь экран
         Image(
             painter = painterResource(R.drawable.background),
@@ -84,35 +85,58 @@ fun ConfirmEmailScreen(
     }
 }
 
+
 @Composable
 private fun Content(
     viewModel: LoginViewModel,
     navController: NavController,
     paddingValues: PaddingValues
 ) {
+    val code = remember { mutableStateOf("") }
+    val codeFocusRequester = remember { FocusRequester() }
+    val showError = remember { mutableStateOf(false) }
+    val errorMessage = remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        Log.d("ConfirmationEmailScreen", "${viewModel.temporaryId}")
+    LaunchedEffect(viewModel.recoveryCodeState.value.isSuccessful) {
+        if (viewModel.recoveryCodeState.value.isSuccessful) {
+            navController.navigate(Screen.RecoveryPassword.route)
+        }
     }
 
-    LaunchedEffect(viewModel.confirmMailState.value.isSuccessful) {
-        if (viewModel.confirmMailState.value.isSuccessful) {
-            if(viewModel.confirmMailState.value.confirmMail?.role == "finder") {
-                navController.navigate("main_graph") {
-                    popUpTo("auth_graph") {
-                        inclusive = true
-                    }
-                }
-            }
-            else{
-                TODO()
+    LaunchedEffect(viewModel.recoveryCodeState.value.statusCode) {
+        if (viewModel.recoveryCodeState.value.statusCode == 400 ||
+            viewModel.recoveryCodeState.value.statusCode == 500
+        ) {
+            navController.navigate(Screen.ForgotPassword.route)
+            viewModel.clearErrors()
+        }
+    }
+
+    if (viewModel.recoveryCodeState.value.isLoading) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(32.dp)
+                    )
+            ) {
+                CircularProgressIndicator(
+                    color = Blue,
+                    strokeWidth = 7.dp,
+                    modifier = Modifier
+                        .size(50.dp)
+                )
             }
         }
     }
 
-
-    val code = remember { mutableStateOf("") }
-    val codeFocusRequester = remember { FocusRequester() }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -122,7 +146,7 @@ private fun Content(
             .fillMaxSize()
     ) {
         Text(
-            text = "Подтвердите почту",
+            text = "Введите код",
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             fontFamily = Inter,
@@ -154,12 +178,54 @@ private fun Content(
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
-        CustomTextButton(text = "Готово", onClick = {
-            viewModel.confirmMail(
-                temporaryId = viewModel.temporaryId ?: 0,
-                emailCode = code.value.toInt()
+        CustomTextButton(
+            text = "Готово", onClick = {
+                recoveryCode(
+                    viewModel = viewModel,
+                    code = code,
+                    showError = showError,
+                    errorMessage = errorMessage
+                )
+            }, color = Blue
+        )
+    }
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        if (showError.value) {
+            MessageBox(
+                text = errorMessage.value,
+                onDismiss = {
+                    showError.value = false
+                },
+                modifier = Modifier
+                    .padding(bottom = 30.dp)
+                    .fillMaxWidth()
             )
-        }, color = Blue)
+        }
+    }
+
+}
+
+fun recoveryCode(
+    viewModel: LoginViewModel,
+    code: MutableState<String>,
+    showError: MutableState<Boolean>,
+    errorMessage: MutableState<String>
+) {
+    val emailCode = code.value
+    val codeInt = emailCode.toIntOrNull()
+    if (codeInt == null) {
+        showError.value = true
+        errorMessage.value = "Неверный код"
+        return
+    } else {
+        viewModel.recoveryCode(
+            temporaryId = viewModel.temporaryId ?: 0,
+            emailCode = emailCode.toInt(),
+        )
     }
 }
 

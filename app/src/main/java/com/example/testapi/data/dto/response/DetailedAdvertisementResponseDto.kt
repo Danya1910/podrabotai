@@ -21,7 +21,4 @@ data class DetailedAdvertisementResponseDto(
     val xp: Int,
 )
 
-data class DetailedAdvertisementWrapperDto(
-    val data: DetailedAdvertisementResponseDto
-)
 

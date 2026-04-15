@@ -2,10 +2,6 @@ package com.example.testapi.data.repository
 
 import android.util.Log
 import com.example.testapi.data.api.PostApi
-import com.example.testapi.data.dto.request.AdvertisementFilterDto
-import com.example.testapi.data.dto.request.CreateAdvertisementRequestDto
-import com.example.testapi.data.dto.request.DeleteFromFavoriteRequestDto
-import com.example.testapi.data.dto.response.CreateAdvertisementResponseDto
 import com.example.testapi.data.mapper.toCreateDto
 import com.example.testapi.data.mapper.toDomain
 import com.example.testapi.data.mapper.toQueryMap

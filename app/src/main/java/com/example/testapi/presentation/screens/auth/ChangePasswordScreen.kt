@@ -1,4 +1,4 @@
-package com.example.testapi.presentation.auth
+package com.example.testapi.presentation.screens.auth
 
 import android.util.Log
 import androidx.compose.foundation.Image

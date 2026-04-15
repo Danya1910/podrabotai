@@ -1,8 +1,6 @@
 package com.example.testapi.di
 
-import com.example.testapi.data.repository.ChatRepositoryImpl
 import com.example.testapi.data.repository.UserRepositoryImpl
-import com.example.testapi.domain.repository.ChatRepository
 import com.example.testapi.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module

@@ -14,21 +14,3 @@ data class AdvertisementResponseDto (
     val user: UserAdvertisementDataDto,
 )
 
-data class UserAdvertisementDataDto(
-    val id: Int,
-    val phone: String?,
-    val photo: String?,
-    val user_name: String
-)
-
-data class AdvertisementDataDto(
-    val jobs: List<AdvertisementResponseDto>
-)
-
-data class AdvertisementWrapperDto(
-    val data: AdvertisementDataDto
-)
-
-data class GetFavoritesResponseDto(
-    val data: List<AdvertisementResponseDto>
-)

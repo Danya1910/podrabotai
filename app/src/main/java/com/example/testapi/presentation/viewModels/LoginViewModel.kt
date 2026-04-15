@@ -40,7 +40,6 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val confirmMailUseCase: ConfirmEmailUseCase,
-    private val getPostsUseCase: GetPostsUseCase,
     private val saveTokenUseCase: SaveTokenUseCase,
     private val getTokenUseCase: GetTokenUseCase,
     private val loginUseCase: LoginUseCase,
@@ -191,7 +190,7 @@ class LoginViewModel @Inject constructor(
                     error = e.message,
                     isLoading = false
                 )
-                Log.d("RecoveryCode", "${e.message}")
+                Log.d("RecoveryCode", "${_recoveryCodeState.value.error}")
             }
         }
     }
@@ -315,8 +314,10 @@ class LoginViewModel @Inject constructor(
         _registerState.value = _registerState.value.copy(error = null)
         _confirmMailState.value = _confirmMailState.value.copy(error = null)
         _forgotPasswordState.value = _forgotPasswordState.value.copy(error = null)
+        _forgotPasswordState.value = _forgotPasswordState.value.copy(isSuccessful = false)
         _recoveryPasswordState.value = _recoveryPasswordState.value.copy(error = null)
         _recoveryCodeState.value = _recoveryCodeState.value.copy(error = null)
+        _recoveryCodeState.value = _recoveryCodeState.value.copy(statusCode = 0)
         _changePasswordState.value = _changePasswordState.value.copy(error = null)
     }
 

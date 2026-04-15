@@ -1,4 +1,3 @@
-// data/api/RetrofitDaData.kt
 package com.example.testapi.data.api
 
 import okhttp3.OkHttpClient

@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.testapi.presentation.auth.ChangePasswordScreen
+import com.example.testapi.presentation.screens.auth.ChangePasswordScreen
 import com.example.testapi.presentation.auth.ChatScreen
 import com.example.testapi.presentation.auth.EmployeeChatsScreen
 import com.example.testapi.presentation.auth.CreateAdvertisementScreen

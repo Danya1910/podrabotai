@@ -1,6 +1,8 @@
-package com.example.testapi.presentation.auth
+package com.example.testapi.presentation.screens.auth
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.testapi.R
 import com.example.testapi.presentation.viewModels.LoginViewModel
-import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.widget.CustomTextButton
 import com.example.testapi.presentation.widget.LoginInputField
 import com.example.testapi.presentation.widget.MessageBox
@@ -71,6 +75,9 @@ private fun Content(
     navController: NavController,
     paddingValues: PaddingValues
 ) {
+    BackHandler {
+        navController.popBackStack()
+    }
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
     val passwordFocusRequester = remember { FocusRequester() }
@@ -84,6 +91,32 @@ private fun Content(
                 popUpTo("auth_graph") {
                     inclusive = true
                 }
+            }
+        }
+    }
+
+
+    if (viewModel.recoveryPasswordState.value.isLoading) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(32.dp)
+                    )
+            ) {
+                CircularProgressIndicator(
+                    color = Blue,
+                    strokeWidth = 7.dp,
+                    modifier = Modifier
+                        .size(50.dp)
+                )
             }
         }
     }

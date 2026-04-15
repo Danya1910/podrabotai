@@ -2,27 +2,18 @@ package com.example.testapi.presentation.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.testapi.presentation.viewModels.LoginViewModel
-import com.example.testapi.presentation.auth.ConfirmEmailScreen
-import com.example.testapi.presentation.auth.CreateAdvertisementScreen
-import com.example.testapi.presentation.auth.DetailedAdvertisementScreen
-import com.example.testapi.presentation.auth.EmployeeWorkScreen
-import com.example.testapi.presentation.auth.ForgotPasswordScreen
-import com.example.testapi.presentation.auth.LoginScreen
-import com.example.testapi.presentation.auth.RecoveryCodeScreen
-import com.example.testapi.presentation.auth.RecoveryPasswordScreen
-import com.example.testapi.presentation.auth.RegistrationScreen
-import com.example.testapi.presentation.viewModels.AdvertisementViewModel
+import com.example.testapi.presentation.screens.auth.ConfirmEmailScreen
+import com.example.testapi.presentation.screens.auth.ForgotPasswordScreen
+import com.example.testapi.presentation.screens.auth.LoginScreen
+import com.example.testapi.presentation.screens.auth.RecoveryCodeScreen
+import com.example.testapi.presentation.screens.auth.RecoveryPasswordScreen
+import com.example.testapi.presentation.screens.auth.RegistrationScreen
 
 @RequiresApi(Build.VERSION_CODES.S)
 fun NavGraphBuilder.AuthNavGraph(navController: NavHostController) {

@@ -1,5 +1,6 @@
-package com.example.testapi.presentation.auth
+package com.example.testapi.presentation.screens.auth
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,16 +47,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.testapi.R
 import com.example.testapi.presentation.viewModels.LoginViewModel
-import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.widget.CustomTextButton
-import com.example.testapi.presentation.widget.MessageBox
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.TransparentWhite
 import com.example.testapi.ui.theme.White
 
 @Composable
-fun RecoveryCodeScreen(
+fun ConfirmEmailScreen(
     viewModel: LoginViewModel,
     navController: NavController
 ) {
@@ -79,28 +78,35 @@ fun RecoveryCodeScreen(
     }
 }
 
-
 @Composable
 private fun Content(
     viewModel: LoginViewModel,
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-    val code = remember { mutableStateOf("") }
-    val codeFocusRequester = remember { FocusRequester() }
-    val showError = remember { mutableStateOf(false) }
-    val errorMessage = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.recoveryCodeState.value.isSuccessful) {
-        if (viewModel.recoveryCodeState.value.isSuccessful) {
-            navController.navigate(Screen.RecoveryPassword.route) {
-                popUpTo(Screen.RecoveryPassword.route) {
-                    inclusive = true
+    LaunchedEffect(Unit) {
+        Log.d("ConfirmationEmailScreen", "${viewModel.temporaryId}")
+    }
+
+    LaunchedEffect(viewModel.confirmMailState.value.isSuccessful) {
+        if (viewModel.confirmMailState.value.isSuccessful) {
+            if(viewModel.confirmMailState.value.confirmMail?.role == "finder") {
+                navController.navigate("main_graph") {
+                    popUpTo("auth_graph") {
+                        inclusive = true
+                    }
                 }
+            }
+            else{
+                TODO()
             }
         }
     }
 
+
+    val code = remember { mutableStateOf("") }
+    val codeFocusRequester = remember { FocusRequester() }
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,7 +116,7 @@ private fun Content(
             .fillMaxSize()
     ) {
         Text(
-            text = "Введите код",
+            text = "Подтвердите почту",
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             fontFamily = Inter,
@@ -142,52 +148,12 @@ private fun Content(
             )
         }
         Spacer(modifier = Modifier.height(20.dp))
-        CustomTextButton(
-            text = "Готово", onClick = {
-                recoveryCode(
-                    viewModel = viewModel,
-                    code = code,
-                    showError = showError,
-                    errorMessage = errorMessage
-                )
-            }, color = Blue
-        )
-    }
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        if (showError.value) {
-            MessageBox(
-                text = errorMessage.value,
-                onDismiss = {
-                    showError.value = false
-                },
-                modifier = Modifier
-                    .padding(bottom = 30.dp)
-                    .fillMaxWidth()
+        CustomTextButton(text = "Готово", onClick = {
+            viewModel.confirmMail(
+                temporaryId = viewModel.temporaryId ?: 0,
+                emailCode = code.value.toInt()
             )
-        }
-    }
-
-}
-
-fun recoveryCode(
-    viewModel: LoginViewModel,
-    code: MutableState<String>,
-    showError: MutableState<Boolean>,
-    errorMessage: MutableState<String>
-) {
-    val emailCode = code.value
-    if (code.value.isEmpty()) {
-        showError.value = true
-        errorMessage.value = "Введите код"
-    } else {
-        viewModel.recoveryCode(
-            temporaryId = viewModel.temporaryId ?: 0,
-            emailCode = emailCode.toInt(),
-        )
+        }, color = Blue)
     }
 }
 

@@ -1,11 +1,6 @@
 package com.example.testapi.di
 
-import com.example.testapi.data.api.PostApi
-import com.example.testapi.data.repository.AdvertisementRepositoryImpl
-import com.example.testapi.data.repository.AuthRepositoryImpl
-import com.example.testapi.domain.model.UpdateAdvertisementResponse
 import com.example.testapi.domain.repository.AdvertisementRepository
-import com.example.testapi.domain.repository.AuthRepository
 import com.example.testapi.domain.usecase.AddToFavoriteUseCase
 import com.example.testapi.domain.usecase.AddToHistoryUseCase
 import com.example.testapi.domain.usecase.CreateAdvertisementUseCase
@@ -17,7 +12,6 @@ import com.example.testapi.domain.usecase.GetDetailedAdvertisementUseCase
 import com.example.testapi.domain.usecase.GetFavoritesUseCase
 import com.example.testapi.domain.usecase.GetHistoryUseCase
 import com.example.testapi.domain.usecase.GetMyAdvertisementsUseCase
-import com.example.testapi.domain.usecase.GetPostsUseCase
 import com.example.testapi.domain.usecase.UpdateAdvertisementUseCase
 import dagger.Module
 import dagger.Provides

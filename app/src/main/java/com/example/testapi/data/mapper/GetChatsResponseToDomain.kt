@@ -9,11 +9,11 @@ fun GetChatsResponseDto.toDomain() : GetChatsResponse {
     return GetChatsResponse(
         jobId = job_id,
         jobName = job_name,
-        lastMessage = last_message_data.toDomain(),
+        lastMessage = last_message_data?.toDomain(),
         penpalAvatar = penpal_avatar,
         penpalId = penpal_id,
         penpalName = penpal_name,
-        unreadedMessages = unread_messages
+        unreadMessages = unread_messages
     )
 }
 

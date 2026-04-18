@@ -1,8 +1,11 @@
-package com.example.testapi.presentation.auth
+package com.example.testapi.presentation.screens.jobs
 
+import android.Manifest
 import android.os.Build
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,11 +40,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -51,15 +56,17 @@ import com.example.testapi.domain.model.AdvertisementFilter
 import com.example.testapi.domain.model.BottomNavItem
 import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
+import com.example.testapi.presentation.viewModels.BigDataCloudViewModel
+import com.example.testapi.presentation.viewModels.LocationViewModel
 import com.example.testapi.presentation.widget.Advertisement
 import com.example.testapi.presentation.widget.CustomBottomBar
-import com.example.testapi.presentation.widget.MessageBox
 import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.SupportText
 import com.example.testapi.ui.theme.TransparentWhite
 import com.example.testapi.ui.theme.White
 import com.example.testapi.ui.theme.WhiteClearness80
+import kotlinx.coroutines.delay
 
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -67,6 +74,8 @@ import com.example.testapi.ui.theme.WhiteClearness80
 fun EmployeeWorkScreen(
     viewModel: AdvertisementViewModel,
     navController: NavController,
+    locationViewModel: LocationViewModel,
+    bigDataCloudViewModel: BigDataCloudViewModel,
 ) {
     BackHandler(enabled = true) {}
     val isFiltered = remember { mutableStateOf(false) }
@@ -128,7 +137,9 @@ fun EmployeeWorkScreen(
                     paddingValues = paddingValues,
                     isFiltered = isFiltered,
                     filterBtnColor = filterBtnColor,
-                    filter = filter
+                    filter = filter,
+                    locationViewModel = locationViewModel,
+                    bigDataCloudViewModel = bigDataCloudViewModel,
                 )
             }
         )
@@ -142,9 +153,11 @@ private fun Content(
     paddingValues: PaddingValues,
     isFiltered: MutableState<Boolean>,
     filterBtnColor: MutableState<Color>,
-    filter: AdvertisementFilter
+    filter: AdvertisementFilter,
+    locationViewModel: LocationViewModel,
+    bigDataCloudViewModel: BigDataCloudViewModel,
 
-) {
+    ) {
     val text = remember { mutableStateOf("") }
 
     val message = remember { mutableStateOf("") }
@@ -152,11 +165,34 @@ private fun Content(
 
     val state = viewModel.getAdvertisementsState.value
 
+    val location = locationViewModel.locationState.value
 
+    val position = bigDataCloudViewModel.positionState.value
+    val city = remember { mutableStateOf("") }
+    val dots = remember { mutableStateOf("") }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            locationViewModel.loadLocation()
+        }
+    }
 
     LaunchedEffect(Unit) {
+        launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         viewModel.loadAdvertisements(filter = filter)
+        while (true) {
+            dots.value = when (dots.value) {
+                "" -> "."
+                "." -> ".."
+                ".." -> "..."
+                else -> ""
+            }
+            delay(500)
+        }
     }
+
 
     LaunchedEffect(filter) {
         if (!filter.isEmpty()) {
@@ -170,6 +206,26 @@ private fun Content(
 
         }
     }
+
+    LaunchedEffect(location) {
+        if (location.location != null && location.error != "Не удалось получить координаты") {
+            bigDataCloudViewModel.loadPosition(
+                lat = location.location.latitude,
+                lng = location.location.longitude
+            )
+        }
+    }
+
+    if (!position.position?.city.isNullOrBlank()) {
+        city.value = position.position.city
+    } else if (!position.error.isNullOrBlank()) {
+        city.value = "Неизвестно"
+    } else {
+        city.value = "Загрузка${dots.value}"
+    }
+
+
+
 
     if (state.isLoading) {
         Box(
@@ -221,19 +277,22 @@ private fun Content(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Казань",
+                    text = city.value,
                     fontFamily = Inter,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     color = White,
-                    letterSpacing = 5.sp
+                    letterSpacing = 3.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f) // 👈 ВОТ ЭТО ГЛАВНОЕ
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
 
                 Box(
                     modifier = Modifier
                         .height(49.dp)
+                        .clip(RoundedCornerShape(32.dp))
                         .border(
                             width = 1.dp,
                             color = White,
@@ -242,7 +301,11 @@ private fun Content(
                         .background(
                             color = TransparentWhite,
                             shape = RoundedCornerShape(32.dp)
-                        ),
+                        )
+                        .clickable {
+                            navController.navigate(Screen.EmployeeProfile.route)
+                        },
+
 
                     ) {
                     Row(
@@ -257,7 +320,7 @@ private fun Content(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 13.sp,
                             color = White,
-                            letterSpacing = 5.sp
+                            letterSpacing = 2.sp
                         )
                         Spacer(modifier = Modifier.width(7.dp))
                         Icon(

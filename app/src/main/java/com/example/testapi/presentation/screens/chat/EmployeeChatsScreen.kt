@@ -191,11 +191,6 @@ private fun Content(
             .padding(horizontal = 30.dp)
             .fillMaxSize()
     ) {
-        if (state.isLoading) {
-            item {
-                CircularProgressIndicator()
-            }
-        }
 
         state.error?.let {
             item {
@@ -286,7 +281,7 @@ private fun Chat(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = chat.lastMessage.text,
+                    text = chat.lastMessage?.text ?: "",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = Inter,
@@ -303,15 +298,15 @@ private fun Chat(
                 modifier = Modifier.wrapContentWidth()
             ) {
                 Text(
-                    text = TimeToDomain(time = chat.lastMessage.createdAt),
+                    text = TimeToDomain(time = chat.lastMessage?.createdAt ?: ""),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     fontFamily = Inter,
                     color = White
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                if (chat.unreadedMessages != 0) {
-                    Circle(text = chat.unreadedMessages.toString())
+                if (chat.unreadMessages != 0) {
+                    Circle(text = chat.unreadMessages.toString())
                 }
             }
         }

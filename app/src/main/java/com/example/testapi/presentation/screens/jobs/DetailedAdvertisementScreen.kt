@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -124,204 +125,209 @@ private fun Content(
     }
 
 
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .padding(paddingValues)
-            .padding(horizontal = 30.dp)
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
+            .fillMaxSize(),
+        contentPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = 30.dp,
+            end = 30.dp,
+            bottom = 80.dp
+        )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = White,
-                    shape = RoundedCornerShape(32.dp)
-                )
-                .padding(all = 15.dp)
-        ) {
-            Column(
-            ) {
-                Text(
-                    text = ad?.title ?: "",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Адрес подработки",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.address ?: "",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Дата подработки",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.date ?: "",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Время подработки",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = calculateWorkHours(
-                        timeStart = ad?.timeStart ?: "",
-                        timeEnd = ad?.timeEnd ?: ""
-                    ),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Зарплата",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.salary.toString(),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = White,
-                    shape = RoundedCornerShape(32.dp)
-                )
-                .padding(vertical = 10.dp, horizontal = 16.dp)
-        ) {
-            Column() {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_avatar),
-                        contentDescription = null,
-                        tint = Color.Unspecified
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = White,
+                        shape = RoundedCornerShape(32.dp)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    .padding(all = 15.dp)
+            ) {
+                Column(
+                ) {
                     Text(
-                        text = ad?.user?.userName ?: "Неизвестно",
+                        text = ad?.title ?: "",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Адрес подработки",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.address ?: "",
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         fontFamily = Inter
                     )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_star),
-                        contentDescription = null,
-                        tint = Blue
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Дата подработки",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.date ?: "",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Время подработки",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = calculateWorkHours(
+                            timeStart = ad?.timeStart ?: "",
+                            timeEnd = ad?.timeEnd ?: ""
+                        ),
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Зарплата",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.salary.toString(),
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
                     )
                 }
-                Spacer(modifier = Modifier.height(17.dp))
-                CommunicateButtons(onCallClick = {}, onWriteClick = {
-                    navController.navigate(
-                        Screen.Chat.passArgs(
-                            penpalId = ad?.user?.id ?: 0,
-                            jobId = jobId
-                        )
-                    )
-                })
             }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = White,
-                    shape = RoundedCornerShape(32.dp)
-                )
-                .padding(all = 15.dp)
-        ) {
-            Column() {
-                Text(
-                    text = "Опыт работы",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.xp.toString(),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Возраст",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.age.toString(),
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = "Описание",
-                    color = SupportText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text = ad?.description ?: "",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = Inter
-                )
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = White,
+                        shape = RoundedCornerShape(32.dp)
+                    )
+                    .padding(vertical = 10.dp, horizontal = 16.dp)
+            ) {
+                Column() {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_avatar),
+                            contentDescription = null,
+                            tint = Color.Unspecified
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = ad?.user?.userName ?: "Неизвестно",
+                            color = Color.Black,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = Inter
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_star),
+                            contentDescription = null,
+                            tint = Blue
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(17.dp))
+                    CommunicateButtons(onCallClick = {}, onWriteClick = {
+                        navController.navigate(
+                            Screen.Chat.passArgs(
+                                penpalId = ad?.user?.id ?: 0,
+                                jobId = jobId
+                            )
+                        )
+                    })
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = White,
+                        shape = RoundedCornerShape(32.dp)
+                    )
+                    .padding(all = 15.dp)
+            ) {
+                Column() {
+                    Text(
+                        text = "Опыт работы",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.xp.toString(),
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Возраст",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.age.toString(),
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Описание",
+                        color = SupportText,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = ad?.description ?: "",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Inter
+                    )
 
+                }
             }
         }
     }

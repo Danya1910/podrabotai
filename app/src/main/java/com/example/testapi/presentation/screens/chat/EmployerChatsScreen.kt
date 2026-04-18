@@ -1,6 +1,7 @@
 package com.example.testapi.presentation.auth
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,6 +55,9 @@ import com.example.testapi.ui.theme.Blue
 import com.example.testapi.ui.theme.ChatBlue
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.White
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -178,11 +182,6 @@ private fun Content(
             .padding(horizontal = 30.dp)
             .fillMaxSize()
     ) {
-        if (state.isLoading) {
-            item {
-                CircularProgressIndicator()
-            }
-        }
 
         state.error?.let {
             item {
@@ -263,8 +262,7 @@ private fun Chat(
                         .padding(horizontal = 5.dp)
                 ) {
                     Text(
-                        //text = chat.name,
-                        text = "Монтажер",
+                        text = chat.penpalName,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Inter,
@@ -273,7 +271,7 @@ private fun Chat(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = chat.lastMessage.text,
+                    text = chat.lastMessage?.text ?: "",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = Inter,
@@ -289,15 +287,15 @@ private fun Chat(
                 modifier = Modifier.wrapContentWidth()
             ) {
                 Text(
-                    text = "12:16",
+                    text = TimeToDomain(time = chat.lastMessage?.createdAt ?: ""),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Light,
                     fontFamily = Inter,
                     color = White
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                if (chat.unreadedMessages != 0) {
-                    Circle(text = chat.unreadedMessages.toString())
+                if (chat.unreadMessages != 0) {
+                    Circle(text = chat.unreadMessages.toString())
                 }
             }
         }
@@ -328,5 +326,22 @@ private fun Circle(
             fontFamily = Inter,
             color = White
         )
+    }
+}
+
+private fun TimeToDomain(
+    time: String
+) : String {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern(
+            "EEE, dd MMM yyyy HH:mm:ss z",
+            Locale.ENGLISH
+        )
+        val dateTime = ZonedDateTime.parse(time, formatter)
+
+        dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+    } catch (e: Exception) {
+        Log.d("ChatsScreenDebug", "error: ${e.message}")
+        ""
     }
 }

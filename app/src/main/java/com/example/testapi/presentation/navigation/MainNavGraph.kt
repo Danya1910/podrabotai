@@ -15,7 +15,7 @@ import com.example.testapi.presentation.auth.EmployeeChatsScreen
 import com.example.testapi.presentation.auth.CreateAdvertisementScreen
 import com.example.testapi.presentation.auth.DetailedAdvertisementScreen
 import com.example.testapi.presentation.auth.EmployeeProfileScreen
-import com.example.testapi.presentation.auth.EmployeeWorkScreen
+import com.example.testapi.presentation.screens.jobs.EmployeeWorkScreen
 import com.example.testapi.presentation.auth.EmployerChatsScreen
 import com.example.testapi.presentation.auth.EmployerProfileScreen
 import com.example.testapi.presentation.auth.EmployerWorkScreen
@@ -25,8 +25,10 @@ import com.example.testapi.presentation.auth.HistoryOfAdvertisementsScreen
 import com.example.testapi.presentation.auth.MyAdvertisementsScreen
 import com.example.testapi.presentation.auth.UpdateAdvertisementScreen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
+import com.example.testapi.presentation.viewModels.BigDataCloudViewModel
 import com.example.testapi.presentation.viewModels.ChatViewModel
 import com.example.testapi.presentation.viewModels.DaDataViewModel
+import com.example.testapi.presentation.viewModels.LocationViewModel
 import com.example.testapi.presentation.viewModels.LoginViewModel
 import com.example.testapi.presentation.viewModels.UserViewModel
 
@@ -34,38 +36,49 @@ import com.example.testapi.presentation.viewModels.UserViewModel
 fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
 
     //Employee Work
-    composable(Screen.EmployeeWork.route) {backStackEntry ->
+    composable(Screen.EmployeeWork.route) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
+        val locationViewModel: LocationViewModel = hiltViewModel(parentEntry)
+        val bigDataCloudViewModel: BigDataCloudViewModel = hiltViewModel(parentEntry)
 
         EmployeeWorkScreen(
             viewModel = viewModel,
-            navController = navController
+            navController = navController,
+            locationViewModel = locationViewModel,
+            bigDataCloudViewModel = bigDataCloudViewModel,
         )
     }
 
     //Employer Work
-    composable(Screen.EmployerWork.route) {backStackEntry ->
+    composable(Screen.EmployerWork.route) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
+        val locationViewModel: LocationViewModel = hiltViewModel(parentEntry)
+        val bigDataCloudViewModel: BigDataCloudViewModel = hiltViewModel(parentEntry)
 
         EmployerWorkScreen(
             viewModel = viewModel,
-            navController = navController
+            navController = navController,
+            locationViewModel = locationViewModel,
+            bigDataCloudViewModel = bigDataCloudViewModel,
         )
     }
 
     //Mine Advertisements
-    composable(Screen.MyAdvertisements.route) {backStackEntry ->
+    composable(Screen.MyAdvertisements.route) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
 
@@ -76,10 +89,11 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
     }
 
     //Filter
-    composable(Screen.Filter.route) {backStackEntry ->
+    composable(Screen.Filter.route) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val daDataViewModel: DaDataViewModel = hiltViewModel()
@@ -92,10 +106,11 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
     }
 
     //Create Adv
-    composable(Screen.CreateAdvertisement.route) {backStackEntry ->
+    composable(Screen.CreateAdvertisement.route) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val daDataViewModel: DaDataViewModel = hiltViewModel()
@@ -111,12 +126,13 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
     composable(
         route = Screen.UpdateAdvertisement.route,
         arguments = listOf(
-            navArgument("jobId") {type = NavType.IntType}
+            navArgument("jobId") { type = NavType.IntType }
         )
-    ) {backStackEntry ->
+    ) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val jobId = backStackEntry.arguments?.getInt("jobId") ?: 0
@@ -138,10 +154,11 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
         arguments = listOf(
             navArgument("jobId") { type = NavType.IntType }
         )
-    ) {backStackEntry ->
+    ) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val jobId = backStackEntry.arguments?.getInt("jobId") ?: 0
@@ -156,10 +173,11 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
     //Favorites
     composable(
         route = Screen.Favorites.route
-    ) {backStackEntry ->
+    ) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
 
@@ -172,10 +190,11 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
     //History of adv
     composable(
         route = Screen.History.route
-    ) {backStackEntry ->
+    ) { backStackEntry ->
 
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry("main_graph") }
+            navController.getBackStackEntry("main_graph")
+        }
 
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
 

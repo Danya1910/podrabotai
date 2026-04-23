@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -117,6 +119,7 @@ private fun Content(
     paddingValues: PaddingValues,
 ) {
 
+    val state = viewModel.getDetailedAdvertisementState.value
     val ad = viewModel.getDetailedAdvertisementState.value.detailedAd
 
     LaunchedEffect(jobId) {
@@ -124,6 +127,30 @@ private fun Content(
         viewModel.addToHistory(jobId = jobId)
     }
 
+    if (state.isLoading) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(32.dp)
+                    )
+            ) {
+                CircularProgressIndicator(
+                    color = Blue,
+                    strokeWidth = 7.dp,
+                    modifier = Modifier
+                        .size(50.dp)
+                )
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -215,7 +242,7 @@ private fun Content(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = ad?.salary.toString(),
+                        text = formatSalary(ad?.salary ?: 0),
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -288,7 +315,7 @@ private fun Content(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = ad?.xp.toString(),
+                        text = formateExp(exp = ad?.xp.toString()),
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -304,7 +331,7 @@ private fun Content(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = ad?.age.toString(),
+                        text = "${ad?.age.toString()} лет",
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
@@ -436,8 +463,35 @@ private fun calculateWorkHours(timeStart: String?, timeEnd: String?): String {
     val rounded = if (decimal < 0.5) whole.toDouble() else whole + 0.5
 
     return if (rounded % 1.0 == 0.0) {
-        rounded.toInt().toString()
+        formateTime(rounded.toInt().toString())
     } else {
-        rounded.toString()
+        formateTime(rounded.toString())
     }
+}
+
+private fun formateTime(
+    time: String
+): String {
+    val t = time.toInt()
+
+    return when {
+        t % 10 == 1 && t % 100 != 11 -> "$t час"
+        t % 10 in 2..4 && (t % 100 !in 12..14) -> "$t часа"
+        else -> "$t часов"
+    }
+}
+
+private fun formateExp(
+    exp: String
+): String {
+    return when {
+        exp == "0" -> "Без опыта"
+        exp == "1" -> "От 1 года"
+        exp == "3" -> "От 3 лет"
+        else -> exp
+    }
+}
+
+private fun formatSalary(salary: Int): String {
+    return "%,d ₽".format(salary).replace(",", " ")
 }

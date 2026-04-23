@@ -246,7 +246,7 @@ private fun Chat(
                 .padding(start = 16.dp, end = 10.dp)
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_un_select),
+                painter = painterResource(R.drawable.ic_avatar),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier.size(55.dp)

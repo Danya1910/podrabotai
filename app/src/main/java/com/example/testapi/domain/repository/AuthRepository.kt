@@ -14,8 +14,6 @@ import com.example.testapi.domain.model.RegisterRequest
 import com.example.testapi.domain.model.TemporaryIdResponse
 
 interface AuthRepository {
-    suspend fun getPosts(): List<LoginResponse>
-
     suspend fun login(request: LoginRequest): LoginResponse
 
     suspend fun register(request: RegisterRequest): TemporaryIdResponse

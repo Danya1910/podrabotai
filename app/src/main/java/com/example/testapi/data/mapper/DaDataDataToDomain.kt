@@ -6,6 +6,9 @@ import com.example.testapi.domain.model.DaDataData
 fun DaDataDataDto.toDomain() : DaDataData {
     return DaDataData(
         city = city,
-        settlement = settlement
+        settlement = settlement,
+        streetWithType = street_with_type,
+        settlementWithType = settlement_with_type,
+        unrestrictedValue = unrestricted_value,
     )
 }

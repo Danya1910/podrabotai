@@ -16,7 +16,6 @@ import com.example.testapi.domain.usecase.ChangePasswordUseCase
 import com.example.testapi.domain.usecase.ChangeRoleUseCase
 import com.example.testapi.domain.usecase.ConfirmEmailUseCase
 import com.example.testapi.domain.usecase.ForgotPasswordUseCase
-import com.example.testapi.domain.usecase.GetPostsUseCase
 import com.example.testapi.domain.usecase.GetTokenUseCase
 import com.example.testapi.domain.usecase.LoginUseCase
 import com.example.testapi.domain.usecase.LogoutUseCase

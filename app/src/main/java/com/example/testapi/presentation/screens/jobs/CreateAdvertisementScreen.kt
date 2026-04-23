@@ -1,8 +1,6 @@
 package com.example.testapi.presentation.auth
 
-import android.icu.text.CaseMap
 import android.util.Log
-import androidx.collection.emptyLongSet
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,21 +47,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -137,6 +126,7 @@ private fun Content(
     val age = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
     val city = remember { mutableStateOf("") }
+    val isAddressSelected = remember { mutableStateOf(false) }
 
     val message = remember { mutableStateOf("") }
     val showMessage = remember { mutableStateOf(false) }
@@ -145,6 +135,8 @@ private fun Content(
     val carColor = if (car.value) Color.Red else Grey
 
     val hasAttemptedSubmit = remember { mutableStateOf(false) }
+
+    val cleanAddress = remember { mutableStateOf("") }
 
 
     LaunchedEffect(viewModel.createAdvertisementState.value.isSuccessful) {
@@ -227,7 +219,9 @@ private fun Content(
                     text = address,
                     hintText = "Напишите адрес подработки",
                     daDataViewModel = daDataViewModel,
-                    city = city
+                    city = city,
+                    addressSelected = isAddressSelected,
+                    cleanAddress = cleanAddress
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -365,7 +359,9 @@ private fun Content(
                 age = age,
                 isUrgent = isUrgent,
                 car = car,
+                addressSelected = isAddressSelected,
                 viewModel = viewModel,
+                cleanAddress = cleanAddress,
                 message = message,
                 showMessage = showMessage
             )
@@ -405,7 +401,9 @@ private fun checkForm(
     age: MutableState<String>,
     isUrgent: MutableState<Boolean>,
     car: MutableState<Boolean>,
+    addressSelected: MutableState<Boolean>,
     viewModel: AdvertisementViewModel,
+    cleanAddress: MutableState<String>,
     message: MutableState<String>,
     showMessage: MutableState<Boolean>
 ) {
@@ -416,6 +414,9 @@ private fun checkForm(
     ) {
         showMessage.value = true
         message.value = "Заполните все поля"
+    } else if (!addressSelected.value) {
+        showMessage.value = true
+        message.value = "Выберите адрес из списка, чтобы продолжить"
     } else {
         val cityId = 1
         viewModel.clearErrors()
@@ -431,6 +432,11 @@ private fun checkForm(
             "Старше 18 лет" -> 18
             else -> 14
         }
+        val finalAddress = if (cleanAddress.value.isNotEmpty()) {
+            cleanAddress.value
+        } else {
+            address.value
+        }
         val dateToBackend = formateDateToBackend(date = date.value)
         viewModel.createAdvertisement(
             title = title.value,
@@ -440,7 +446,7 @@ private fun checkForm(
             date = dateToBackend,
             timeStart = formatTimeToBackend(timeStart.value),
             timeEnd = formatTimeToBackend(timeEnd.value),
-            address = address.value,
+            address = finalAddress,
             cityId = cityId,
             city = city.value,
             xp = exp,
@@ -448,6 +454,22 @@ private fun checkForm(
             isUrgent = isUrgent.value,
             car = car.value,
         )
+    }
+}
+
+private fun extractAddress(
+    unrestrictedValue: String,
+    streetWithType: String?,
+    settlementWithType: String?
+): String {
+    val target = streetWithType ?: settlementWithType ?: return unrestrictedValue
+
+    val index = unrestrictedValue.indexOf(target)
+
+    return if (index != -1) {
+        unrestrictedValue.substring(index).trim()
+    } else {
+        unrestrictedValue
     }
 }
 
@@ -580,7 +602,9 @@ private fun InputFieldForAddress(
     text: MutableState<String>,
     hintText: String,
     daDataViewModel: DaDataViewModel,
-    city: MutableState<String>
+    city: MutableState<String>,
+    addressSelected: MutableState<Boolean>,
+    cleanAddress: MutableState<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val state = daDataViewModel.getSuggestionsState.value
@@ -653,11 +677,25 @@ private fun InputFieldForAddress(
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .clickable {
+                                val data = suggestion.data
+
                                 text.value = suggestion.value
+                                addressSelected.value = true
+
+                                val fullAddress = data.unrestrictedValue ?: suggestion.value
+
+                                cleanAddress.value = extractAddress(
+                                    unrestrictedValue = fullAddress,
+                                    streetWithType = data.streetWithType,
+                                    settlementWithType = data.settlementWithType
+                                )
+                                Log.d("CreateAd", "unrestrictedValue: $fullAddress")
+                                Log.d("CreateAd", "streetValue: ${data.streetWithType}")
+
                                 expanded = false
                                 daDataViewModel.clearSuggestions()
-                                city.value =
-                                    suggestion.data.city ?: suggestion.data.settlement ?: ""
+
+                                city.value = data.city ?: data.settlement ?: ""
                             }
                             .padding(vertical = 8.dp, horizontal = 30.dp)
                     ) {

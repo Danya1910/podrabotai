@@ -156,7 +156,6 @@ private fun Content(
     filter: AdvertisementFilter,
     locationViewModel: LocationViewModel,
     bigDataCloudViewModel: BigDataCloudViewModel,
-
     ) {
     val text = remember { mutableStateOf("") }
 

@@ -130,13 +130,14 @@ private fun Content(
     val salary = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
     val city = remember { mutableStateOf("") }
+    val isAddressSelected = remember { mutableStateOf(false) }
 
     val message = remember { mutableStateOf("") }
     val showMessage = remember { mutableStateOf(false) }
 
     val hasAttemptedSubmit = remember { mutableStateOf(false) }
 
-
+    val cleanAddress = remember { mutableStateOf("") }
 
     LaunchedEffect(viewModel.updateAdvertisementState.value.isSuccessful) {
         if (!hasAttemptedSubmit.value) return@LaunchedEffect
@@ -316,9 +317,11 @@ private fun Content(
                 Spacer(modifier = Modifier.height(10.dp))
                 InputFieldForAddress(
                     text = address,
-                    hintText = origin.address,
+                    hintText = "Напишите адрес подработки",
                     daDataViewModel = daDataViewModel,
-                    city = city
+                    city = city,
+                    addressSelected = isAddressSelected,
+                    cleanAddress = cleanAddress
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -360,7 +363,7 @@ private fun Content(
                     fontFamily = Inter
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                InputField(
+                InputFieldForSalary(
                     text = salary,
                     hintText = origin.salary.toString()
                 )
@@ -470,7 +473,9 @@ private fun Content(
                 age = age,
                 isUrgent = isUrgent,
                 car = car,
+                addressSelected = isAddressSelected,
                 viewModel = viewModel,
+                cleanAddress = cleanAddress,
                 message = message,
                 showMessage = showMessage,
                 jobId = jobId
@@ -515,7 +520,9 @@ private fun checkForm(
     age: MutableState<String>,
     isUrgent: MutableState<Boolean>,
     car: MutableState<Boolean>,
+    addressSelected: MutableState<Boolean>,
     viewModel: AdvertisementViewModel,
+    cleanAddress: MutableState<String>,
     message: MutableState<String>,
     showMessage: MutableState<Boolean>,
     jobId: Int
@@ -535,6 +542,11 @@ private fun checkForm(
         "Старше 18 лет" -> 18
         else -> 14
     }
+    val finalAddress = if (cleanAddress.value.isNotEmpty()) {
+        cleanAddress.value
+    } else {
+        address.value
+    }
     val dateToBackend = formateDateToBackend(date = date.value)
     viewModel.updateAdvertisement(
         title = title.value.takeIf { it.isNotBlank() },
@@ -544,7 +556,7 @@ private fun checkForm(
         date = dateToBackend.takeIf { it.isNotBlank() },
         timeStart = formatTimeToBackend(timeStart.value).takeIf { it.isNotBlank() },
         timeEnd = formatTimeToBackend(timeEnd.value).takeIf { it.isNotBlank() },
-        address = address.value.takeIf { it.isNotBlank() },
+        address = cleanAddress.value.takeIf { it.isNotBlank() },
         cityId = cityId,
         city = city.value.takeIf { it.isNotBlank() },
         xp = exp.takeIf { it != 0 },
@@ -553,6 +565,22 @@ private fun checkForm(
         car = car.value,
         jobId = jobId
     )
+}
+
+private fun extractAddress(
+    unrestrictedValue: String,
+    streetWithType: String?,
+    settlementWithType: String?
+): String {
+    val target = streetWithType ?: settlementWithType ?: return unrestrictedValue
+
+    val index = unrestrictedValue.indexOf(target)
+
+    return if (index != -1) {
+        unrestrictedValue.substring(index).trim()
+    } else {
+        unrestrictedValue
+    }
 }
 
 private fun formatTimeToBackend(raw: String): String {
@@ -638,13 +666,60 @@ private fun InputField(
     }
 }
 
+@Composable
+private fun InputFieldForSalary(
+    text: MutableState<String>,
+    hintText: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(
+                color = InputGrey,
+                shape = RoundedCornerShape(15.dp)
+            )
+    ) {
+        BasicTextField(
+            value = text.value,
+            onValueChange = { input ->
+                text.value = input.filter { it.isDigit() }
+            },
+            singleLine = true,
+            textStyle = TextStyle(color = SupportText, fontSize = 16.sp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(47.dp)
+                .padding(start = 16.dp, end = 16.dp),
+            decorationBox = { innerTextField ->
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    if (text.value.isEmpty()) {
+                        Text(
+                            text = hintText,
+                            color = SupportText.copy(alpha = 0.6f),
+                            fontSize = 16.sp
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+    }
+}
 
 @Composable
 private fun InputFieldForAddress(
     text: MutableState<String>,
     hintText: String,
     daDataViewModel: DaDataViewModel,
-    city: MutableState<String>
+    city: MutableState<String>,
+    addressSelected: MutableState<Boolean>,
+    cleanAddress: MutableState<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val state = daDataViewModel.getSuggestionsState.value
@@ -717,11 +792,25 @@ private fun InputFieldForAddress(
                                 shape = RoundedCornerShape(15.dp)
                             )
                             .clickable {
+                                val data = suggestion.data
+
                                 text.value = suggestion.value
+                                addressSelected.value = true
+
+                                val fullAddress = data.unrestrictedValue ?: suggestion.value
+
+                                cleanAddress.value = extractAddress(
+                                    unrestrictedValue = fullAddress,
+                                    streetWithType = data.streetWithType,
+                                    settlementWithType = data.settlementWithType
+                                )
+                                Log.d("UpdateAd", "unrestrictedValue: $fullAddress")
+                                Log.d("UpdateAd", "streetValue: ${data.streetWithType}")
+
                                 expanded = false
                                 daDataViewModel.clearSuggestions()
-                                city.value =
-                                    suggestion.data.city ?: suggestion.data.settlement ?: ""
+
+                                city.value = data.city ?: data.settlement ?: ""
                             }
                             .padding(vertical = 8.dp, horizontal = 30.dp)
                     ) {

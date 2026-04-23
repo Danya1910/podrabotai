@@ -43,6 +43,8 @@ import com.example.testapi.presentation.widget.CustomBottomBar
 import com.example.testapi.presentation.widget.CustomTextButton
 import com.example.testapi.presentation.widget.CustomTopAppBar
 import com.example.testapi.ui.theme.Blue
+import com.example.testapi.ui.theme.Grey
+import com.example.testapi.ui.theme.GreyForCorner
 import com.example.testapi.ui.theme.Inter
 import com.example.testapi.ui.theme.White
 
@@ -198,7 +200,7 @@ private fun Content(
         Spacer(modifier = Modifier.height(15.dp))
         CustomTextButton(
             text = "Сменить пароль",
-            color = Blue,
+            color = Grey,
             onClick = {
                 navController.navigate(Screen.ChangePassword.route)
             }

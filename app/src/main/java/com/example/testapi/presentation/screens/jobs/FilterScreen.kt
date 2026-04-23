@@ -212,31 +212,6 @@ private fun Content(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    CircleIcon(route = R.drawable.ic_lightning, color = isUrgentColor)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Срочно",
-                        color = Color.Black,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = Inter
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Switch(
-                        checked = isUrgent.value,
-                        onCheckedChange = { isUrgent.value = it },
-                        modifier = Modifier.scale(0.8f),
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = White,
-                            checkedTrackColor = Blue,
-                            uncheckedThumbColor = White,
-                            uncheckedTrackColor = Grey
-                        )
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
                     CircleIcon(route = R.drawable.ic_car, color = carColor)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -350,7 +325,7 @@ private fun checkForm(
     }
     val dateToBackend = formateDateToBackend(date = date.value)
     val filter = AdvertisementFilter(
-        car = null,
+        car = car.value,
         salary = salary.value.toIntOrNull(),
         age = ageRequest,
         xp = exp,
@@ -389,46 +364,7 @@ private fun formateDateToBackend(date: String): String {
     }
 }
 
-@Composable
-private fun InputField(
-    text: MutableState<String>,
-    hintText: String
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .background(
-                color = InputGrey,
-                shape = RoundedCornerShape(15.dp)
-            )
-    ) {
-        BasicTextField(
-            value = text.value,
-            onValueChange = { text.value = it },
-            singleLine = true,
-            textStyle = TextStyle(color = SupportText, fontSize = 16.sp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(47.dp)
-                .padding(start = 16.dp, end = 16.dp),
-            decorationBox = { innerTextField ->
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    if (text.value.isEmpty()) {
-                        Text(
-                            text = hintText,
-                            color = SupportText.copy(alpha = 0.6f),
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-    }
-}
+
 
 @Composable
 private fun InputFieldForSalary(
@@ -630,154 +566,6 @@ private fun DateInputField(
     }
 }
 
-
-@Composable
-private fun InputDescriptionField(
-    text: MutableState<String>,
-    hintText: String
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = InputGrey,
-                shape = RoundedCornerShape(15.dp)
-            )
-    ) {
-        BasicTextField(
-            value = text.value,
-            onValueChange = { text.value = it },
-            singleLine = false,
-            maxLines = Int.MAX_VALUE,
-            textStyle = TextStyle(color = SupportText, fontSize = 16.sp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(47.dp)
-                .wrapContentHeight()
-                .padding(start = 16.dp, end = 16.dp),
-            decorationBox = { innerTextField ->
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    if (text.value.isEmpty()) {
-                        Text(
-                            text = hintText,
-                            color = SupportText.copy(alpha = 0.6f),
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-    }
-}
-
-
-@Composable
-private fun AdTime(
-    timeStart: MutableState<String>,
-    timeEnd: MutableState<String>
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(40.dp)
-                .background(
-                    color = InputGrey,
-                    shape = RoundedCornerShape(15.dp)
-                )
-        ) {
-            BasicTextField(
-                value = timeStart.value,
-                onValueChange = { input ->
-                    // Храним только цифры
-                    timeStart.value = input.filter { it.isDigit() }.take(4)
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                visualTransformation = TimeVisualTransformation(),
-                textStyle = TextStyle(
-                    color = SupportText,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(47.dp)
-                    .padding(horizontal = 16.dp),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (timeStart.value.isEmpty()) {
-                            Text(
-                                text = "ЧЧ:ММ",
-                                color = SupportText.copy(alpha = 0.6f),
-                                fontSize = 16.sp
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(40.dp)
-                .background(
-                    color = InputGrey,
-                    shape = RoundedCornerShape(15.dp)
-                )
-        ) {
-            BasicTextField(
-                value = timeEnd.value,
-                onValueChange = { input ->
-                    // Храним только цифры
-                    timeEnd.value = input.filter { it.isDigit() }.take(4)
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ),
-                visualTransformation = TimeVisualTransformation(),
-                textStyle = TextStyle(
-                    color = SupportText,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(47.dp)
-                    .padding(horizontal = 16.dp),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (timeEnd.value.isEmpty()) {
-                            Text(
-                                text = "ЧЧ:ММ",
-                                color = SupportText.copy(alpha = 0.6f),
-                                fontSize = 16.sp
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
-        }
-    }
-}
 
 class TimeVisualTransformation : VisualTransformation {
 

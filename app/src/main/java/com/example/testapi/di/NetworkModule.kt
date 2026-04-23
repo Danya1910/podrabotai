@@ -3,6 +3,7 @@ package com.example.testapi.di
 import com.example.testapi.data.network.AuthInterceptor
 import com.example.testapi.data.api.PostApi
 import com.example.testapi.data.socket.SocketManager
+import com.example.testapi.domain.repository.AuthRepository
 import com.example.testapi.domain.repository.LocalDataSourceRepository
 import dagger.Module
 import dagger.Provides
@@ -21,7 +22,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        localRepository: LocalDataSourceRepository
+        localRepository: LocalDataSourceRepository,
     ): AuthInterceptor {
         return AuthInterceptor(localRepository)
     }

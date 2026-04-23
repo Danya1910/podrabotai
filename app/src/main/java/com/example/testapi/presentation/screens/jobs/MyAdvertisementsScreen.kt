@@ -189,7 +189,7 @@ private fun Content(
                         message = message,
                         showMessage = showMessage,
                     )
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }

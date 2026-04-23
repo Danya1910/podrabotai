@@ -2,6 +2,7 @@ package com.example.testapi.data.repository
 
 import android.util.Log
 import com.example.testapi.data.api.PostApi
+import com.example.testapi.data.dto.request.LoginRequestDto
 import com.example.testapi.data.mapper.toCreateDto
 import com.example.testapi.data.mapper.toDomain
 import com.example.testapi.domain.model.ChangePasswordRequest
@@ -17,18 +18,20 @@ import com.example.testapi.domain.model.RecoveryPasswordRequest
 import com.example.testapi.domain.model.RegisterRequest
 import com.example.testapi.domain.model.TemporaryIdResponse
 import com.example.testapi.domain.repository.AuthRepository
+import com.example.testapi.domain.repository.LocalDataSourceRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val api: PostApi
+    private val api: PostApi,
 ) : AuthRepository {
-    override suspend fun getPosts() : List<LoginResponse> {
-        return api.getPosts().map { it.toDomain() }
-    }
+
 
     override suspend fun login(request: LoginRequest) : LoginResponse{
         return api.login(request.toCreateDto()).toDomain()
     }
+
 
     override suspend fun register(request: RegisterRequest): TemporaryIdResponse {
         return api.register(request.toCreateDto()).toDomain()

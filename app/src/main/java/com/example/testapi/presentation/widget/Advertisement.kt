@@ -131,7 +131,9 @@ fun Advertisement(
                 CommunicateButtons(
                     navController = navController,
                     jobId = ad.id,
-                    penpalId = ad.user.id
+                    penpalId = ad.user.id,
+                    message = message,
+                    activeMessageAdId = activeMessageAdId,
                 )
             }
         }
@@ -312,7 +314,9 @@ private fun InfoFields(
 private fun CommunicateButtons(
     navController: NavController,
     penpalId: Int,
-    jobId: Int
+    jobId: Int,
+    message: MutableState<String>? = null,
+    activeMessageAdId: MutableState<Int?>? = null,
 ) {
     Row(
         modifier = Modifier
@@ -360,6 +364,10 @@ private fun CommunicateButtons(
                     shape = RoundedCornerShape(30.dp)
                 )
                 .background(Color.White)
+                .clickable {
+                message?.value = "Функция скоро появится"
+                activeMessageAdId?.value = jobId
+            }
                 .padding(horizontal = 10.dp),
             contentAlignment = Alignment.Center
         ) {

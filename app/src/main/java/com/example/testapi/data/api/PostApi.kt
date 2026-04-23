@@ -46,8 +46,6 @@ import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 interface PostApi {
-    @GET("posts/1/comments")
-    suspend fun getPosts(): List<LoginResponseDto>
 
     //auth
     @POST(value = "auth/login_mail")

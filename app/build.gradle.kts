@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.foundation.layout)
     implementation(libs.foundation.layout)
     implementation(libs.volley)
+    implementation(libs.androidx.camera.camera2.pipe)
     kapt("com.google.dagger:hilt-compiler:2.52")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 

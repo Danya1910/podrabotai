@@ -32,6 +32,9 @@ import com.example.testapi.presentation.states.GetHistoryState
 import com.example.testapi.presentation.states.GetMyAdvertisementsState
 import com.example.testapi.presentation.states.UpdateAdvertisementState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,32 +56,31 @@ class AdvertisementViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase
 ) : ViewModel() {
 
-    private val _getAdvertisementsState = mutableStateOf(GetAdvertisementsState())
-    private val _getDetailedAdvertisementState = mutableStateOf(GetDetailedAdvertisementState())
-    private val _createAdvertisementState = mutableStateOf(CreateAdvertisementState())
-    private val _updateAdvertisementState = mutableStateOf(UpdateAdvertisementState())
+    private val _getAdvertisementsState = MutableStateFlow(GetAdvertisementsState())
+    private val _getDetailedAdvertisementState = MutableStateFlow(GetDetailedAdvertisementState())
+    private val _createAdvertisementState = MutableStateFlow(CreateAdvertisementState())
+    private val _updateAdvertisementState = MutableStateFlow(UpdateAdvertisementState())
     private val _addToFavoriteState = mutableStateOf(AddToFavoriteState())
     private val _deleteFromFavoriteState = mutableStateOf(DeleteFromFavoriteState())
-    private val _addToHistoryState = mutableStateOf(AddToHistoryState())
-    private val _getHistoryState = mutableStateOf(GetHistoryState())
-    private val _getFavoritesState = mutableStateOf(GetFavoritesState())
-    private val _getMyAdvertisementsState = mutableStateOf(GetMyAdvertisementsState())
-    private val _deleteAdvertisementState = mutableStateOf(DeleteAdvertisementState())
-    private val _getCitiesState = mutableStateOf(GetCitiesState())
+    private val _addToHistoryState = MutableStateFlow(AddToHistoryState())
+    private val _getHistoryState = MutableStateFlow(GetHistoryState())
+    private val _getFavoritesState = MutableStateFlow(GetFavoritesState())
+    private val _getMyAdvertisementsState = MutableStateFlow(GetMyAdvertisementsState())
+    private val _deleteAdvertisementState = MutableStateFlow(DeleteAdvertisementState())
+    private val _getCitiesState = MutableStateFlow(GetCitiesState())
 
-    val getAdvertisementsState: State<GetAdvertisementsState> = _getAdvertisementsState
-    val getDetailedAdvertisementState: State<GetDetailedAdvertisementState> =
-        _getDetailedAdvertisementState
-    val createAdvertisementState: State<CreateAdvertisementState> = _createAdvertisementState
-    val updateAdvertisementState: State<UpdateAdvertisementState> = _updateAdvertisementState
+    val getAdvertisementsState = _getAdvertisementsState.asStateFlow()
+    val getDetailedAdvertisementState = _getDetailedAdvertisementState.asStateFlow()
+    val createAdvertisementState = _createAdvertisementState.asStateFlow()
+    val updateAdvertisementState = _updateAdvertisementState.asStateFlow()
     val addToFavoriteState: State<AddToFavoriteState> = _addToFavoriteState
     val deleteFromFavoriteState: State<DeleteFromFavoriteState> = _deleteFromFavoriteState
-    val addToHistoryState: State<AddToHistoryState> = _addToHistoryState
-    val getHistoryState: State<GetHistoryState> = _getHistoryState
-    val getFavoritesState: State<GetFavoritesState> = _getFavoritesState
-    val getMyAdvertisementsState: State<GetMyAdvertisementsState> = _getMyAdvertisementsState
-    val deleteAdvertisementState: State<DeleteAdvertisementState> = _deleteAdvertisementState
-    val getCitiesState: State<GetCitiesState> = _getCitiesState
+    val addToHistoryState = _addToHistoryState.asStateFlow()
+    val getHistoryState = _getHistoryState.asStateFlow()
+    val getFavoritesState = _getFavoritesState.asStateFlow()
+    val getMyAdvertisementsState = _getMyAdvertisementsState.asStateFlow()
+    val deleteAdvertisementState = _deleteAdvertisementState.asStateFlow()
+    val getCitiesState = _getCitiesState.asStateFlow()
 
 
     private val _isFavorite = mutableStateOf(false)
@@ -91,50 +93,61 @@ class AdvertisementViewModel @Inject constructor(
     }
 
     fun loadAdvertisements(
-        filter: AdvertisementFilter? = null
+        filter: AdvertisementFilter? = null,
     ) {
         viewModelScope.launch {
-            _getAdvertisementsState.value = _getAdvertisementsState.value.copy(isLoading = true)
+            _getAdvertisementsState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             val token = getTokenUseCase()
             Log.d("Test Token Ad", "$token")
             try {
-                _getAdvertisementsState.value = _getAdvertisementsState.value.copy(
-                    ads = getAdvertisementsUseCase(
-                        filter = filter
-                    ),
-                    isLoading = false,
-                    isSuccessful = true,
-                )
+                _getAdvertisementsState.update {
+                    it.copy(
+                        ads = getAdvertisementsUseCase(filter),
+                        isLoading = false,
+                        isSuccessful = true,
+                    )
+                }
                 Log.d(
                     "API_DEBUG",
                     "Ads count = ${_getAdvertisementsState.value.ads.size}"
                 )
             } catch (e: Exception) {
-                _getAdvertisementsState.value = _getAdvertisementsState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _getAdvertisementsState.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false,
+                    )
+                }
             } finally {
-                _getAdvertisementsState.value = _getAdvertisementsState.value.copy(
-                    isLoading = false
-                )
+                _getAdvertisementsState.update {
+                    it.copy(
+                        isLoading = false,
+                    )
+                }
             }
         }
     }
 
     fun loadDetailedAdvertisement(jobId: Int) {
         viewModelScope.launch {
-            _getDetailedAdvertisementState.value = _getDetailedAdvertisementState.value.copy(
-                isLoading = true
-            )
+            _getDetailedAdvertisementState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val ad = getDetailedAdvertisementUseCase(jobId)
-                _getDetailedAdvertisementState.value =
-                    _getDetailedAdvertisementState.value.copy(
+                _getDetailedAdvertisementState.update {
+                    it.copy(
                         detailedAd = ad,
                         isLoading = false,
-                        isSuccessful = true,
+                        isSuccessful = true
                     )
+                }
                 Log.d(
                     "DetailedAdvertisement",
                     "Detailed Ad= ${_getDetailedAdvertisementState.value.detailedAd}"
@@ -145,14 +158,18 @@ class AdvertisementViewModel @Inject constructor(
                     _deleteFromFavoriteState.value.copy(isSuccessful = !ad.isFavorite)
                 _isFavorite.value = ad.isFavorite
             } catch (e: Exception) {
-                _getDetailedAdvertisementState.value = _getDetailedAdvertisementState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getDetailedAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             } finally {
-                _getDetailedAdvertisementState.value = _getDetailedAdvertisementState.value.copy(
-                    isLoading = false,
-                )
+                _getDetailedAdvertisementState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
             }
 
         }
@@ -220,24 +237,30 @@ class AdvertisementViewModel @Inject constructor(
 
     fun loadFavorites() {
         viewModelScope.launch {
-            _getFavoritesState.value = _getFavoritesState.value.copy(
-                isLoading = true
-            )
-            try {
-                _getFavoritesState.value = _getFavoritesState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    favorites = getFavoritesUseCase()
+            _getFavoritesState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _getFavoritesState.update {
+                    it.copy(
+                        favorites = getFavoritesUseCase(),
+                        isSuccessful = true,
+                        isLoading = false
+                    )
+                }
                 Log.d(
                     "GetFavorites",
                     "Favorites Ads= ${_getFavoritesState.value.favorites}"
                 )
             } catch (e: Exception) {
-                _getFavoritesState.value = _getFavoritesState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getFavoritesState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -246,44 +269,56 @@ class AdvertisementViewModel @Inject constructor(
         jobId: Int
     ) {
         viewModelScope.launch {
-            _addToHistoryState.value = _addToHistoryState.value.copy(
-                isLoading = true
-            )
+            _addToHistoryState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _addToHistoryState.value = _addToHistoryState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    addToHistory = addToHistoryUseCase(jobId = jobId)
-                )
+                _addToHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        addToHistory = addToHistoryUseCase(jobId = jobId)
+                    )
+                }
             } catch (e: Exception) {
-                _addToHistoryState.value = _addToHistoryState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _addToHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message,
+                    )
+                }
             }
         }
     }
 
     fun loadHistory() {
         viewModelScope.launch {
-            _getHistoryState.value = _getHistoryState.value.copy(
-                isLoading = true
-            )
-            try {
-                _getHistoryState.value = _getHistoryState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    history = getHistoryUseCase()
+            _getHistoryState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _getHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        history = getHistoryUseCase()
+                    )
+                }
                 Log.d(
                     "GetHistory",
                     "History Ads= ${_getHistoryState.value.history}"
                 )
             } catch (e: Exception) {
-                _getHistoryState.value = _getHistoryState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -303,10 +338,11 @@ class AdvertisementViewModel @Inject constructor(
 
         }
 
-        _getAdvertisementsState.value =
-            _getAdvertisementsState.value.copy(
+        _getAdvertisementsState.update {
+            it.copy(
                 ads = list
             )
+        }
 
     }
 
@@ -323,9 +359,11 @@ class AdvertisementViewModel @Inject constructor(
                 isFavorite = !historyAd.isFavorite
             )
         }
-        _getHistoryState.value = _getHistoryState.value.copy(
-            history = historyList
-        )
+        _getHistoryState.update {
+            it.copy(
+                history = historyList
+            )
+        }
     }
 
     fun createAdvertisement(
@@ -345,43 +383,51 @@ class AdvertisementViewModel @Inject constructor(
         car: Boolean
     ) {
         viewModelScope.launch {
-            _createAdvertisementState.value = _createAdvertisementState.value.copy(
-                isLoading = true
-            )
-            try {
-                _createAdvertisementState.value = _createAdvertisementState.value.copy(
-                    createAd = createAdvertisementUseCase(
-                        title = title,
-                        wantedJob = wantedJob,
-                        description = description,
-                        salary = salary,
-                        date = date,
-                        timeStart = timeStart,
-                        timeEnd = timeEnd,
-                        address = address,
-                        cityId = cityId,
-                        city = city,
-                        xp = xp,
-                        age = age,
-                        isUrgent = isUrgent,
-                        car = car
-                    ),
-                    isLoading = false,
-                    isSuccessful = true
+            _createAdvertisementState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _createAdvertisementState.update {
+                    it.copy(
+                        createAd = createAdvertisementUseCase(
+                            title = title,
+                            wantedJob = wantedJob,
+                            description = description,
+                            salary = salary,
+                            date = date,
+                            timeStart = timeStart,
+                            timeEnd = timeEnd,
+                            address = address,
+                            cityId = cityId,
+                            city = city,
+                            xp = xp,
+                            age = age,
+                            isUrgent = isUrgent,
+                            car = car
+                        ),
+                        isLoading = false,
+                        isSuccessful = true
+                    )
+                }
                 Log.d(
                     "CreateAdvertisement",
                     "Create Ad= ${_createAdvertisementState.value.createAd}"
                 )
             } catch (e: Exception) {
-                _createAdvertisementState.value = _createAdvertisementState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _createAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             } finally {
-                _createAdvertisementState.value = _createAdvertisementState.value.copy(
-                    isLoading = false
-                )
+                _createAdvertisementState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -404,36 +450,42 @@ class AdvertisementViewModel @Inject constructor(
         jobId: Int,
     ) {
         viewModelScope.launch {
-            _updateAdvertisementState.value = _updateAdvertisementState.value.copy(
-                isLoading = true
-            )
+            _updateAdvertisementState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _updateAdvertisementState.value = _updateAdvertisementState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    updateAd = updateAdvertisementUseCase(
-                        title = title,
-                        wantedJob = wantedJob,
-                        description = description,
-                        salary = salary,
-                        date = date,
-                        timeStart = timeStart,
-                        timeEnd = timeEnd,
-                        address = address,
-                        cityId = cityId,
-                        city = city,
-                        xp = xp,
-                        age = age,
-                        isUrgent = isUrgent,
-                        car = car,
-                        jobId = jobId
+                _updateAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        updateAd = updateAdvertisementUseCase(
+                            title = title,
+                            wantedJob = wantedJob,
+                            description = description,
+                            salary = salary,
+                            date = date,
+                            timeStart = timeStart,
+                            timeEnd = timeEnd,
+                            address = address,
+                            cityId = cityId,
+                            city = city,
+                            xp = xp,
+                            age = age,
+                            isUrgent = isUrgent,
+                            car = car,
+                            jobId = jobId
+                        )
                     )
-                )
+                }
             } catch (e: Exception) {
-                _updateAdvertisementState.value = _updateAdvertisementState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _updateAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -442,83 +494,108 @@ class AdvertisementViewModel @Inject constructor(
         jobId: Int
     ) {
         viewModelScope.launch {
-            _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
-                isLoading = true
-            )
-            try {
-                _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    deleteAd = deleteAdvertisementUseCase(jobId = jobId)
+            _deleteAdvertisementState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _deleteAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        deleteAd = deleteAdvertisementUseCase(jobId = jobId)
+                    )
+                }
                 loadMyAdvertisements()
             } catch (e: Exception) {
-                _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _deleteAdvertisementState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun loadMyAdvertisements() {
         viewModelScope.launch {
-            _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(isLoading = true)
-            try {
-                _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(
-                    myAds = getMyAdvertisementsUseCase(),
-                    isLoading = false,
-                    isSuccessful = true,
+            _getMyAdvertisementsState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _getMyAdvertisementsState.update {
+                    it.copy(
+                        myAds = getMyAdvertisementsUseCase(),
+                        isLoading = false,
+                        isSuccessful = true
+                    )
+                }
                 Log.d(
                     "API_DEBUG",
                     "Ads count = ${_getMyAdvertisementsState.value.myAds.size}"
                 )
             } catch (e: Exception) {
-                _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _getMyAdvertisementsState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             } finally {
-                _getMyAdvertisementsState.value = _getMyAdvertisementsState.value.copy(
-                    isLoading = false
-                )
+                _getMyAdvertisementsState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     fun getCities() {
         viewModelScope.launch {
-            _getCitiesState.value = _getCitiesState.value.copy(
-                isLoading = true
-            )
-            try {
-                _getCitiesState.value = _getCitiesState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    cities = getCitiesUseCase()
+            _getCitiesState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _getCitiesState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        cities = getCitiesUseCase()
+                    )
+                }
                 Log.d(
                     "API_DEBUG",
                     "Cities = ${_getCitiesState.value.cities}"
                 )
             } catch (e: Exception) {
-                _getCitiesState.value = _getCitiesState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getCitiesState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun clearErrors() {
-        _createAdvertisementState.value = _createAdvertisementState.value.copy(
-            error = null
-        )
-        _deleteAdvertisementState.value = _deleteAdvertisementState.value.copy(
-            isSuccessful = false,
-            error = null
-        )
+        _createAdvertisementState.update {
+            it.copy(
+                error = null
+            )
+        }
+        _deleteAdvertisementState.update {
+            it.copy(
+                error = null,
+                isSuccessful = false
+            )
+        }
     }
-
 }

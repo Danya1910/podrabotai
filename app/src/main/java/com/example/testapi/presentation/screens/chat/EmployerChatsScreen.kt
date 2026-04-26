@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,7 +123,7 @@ private fun Content(
     paddingValues: PaddingValues,
 ) {
 
-    val state = viewModel.getChatsState.value
+    val state = viewModel.getChatsState.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.loadChats()

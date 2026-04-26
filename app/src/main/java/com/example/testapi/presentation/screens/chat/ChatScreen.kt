@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -122,7 +123,7 @@ private fun Content(
     }
 
 
-    val createState = viewModel.createChatState.value
+    val createState = viewModel.createChatState.collectAsState().value
     val warming = remember { mutableStateOf(false) }
 
     LaunchedEffect(createState.error == "HTTP 406 NOT ACCEPTABLE") {
@@ -132,7 +133,7 @@ private fun Content(
         }
     }
 
-    LaunchedEffect(viewModel.getChatHistoryState.value.error) {
+    LaunchedEffect(viewModel.getChatHistoryState.collectAsState().value.error) {
         if (viewModel.getChatHistoryState.value.error == "HTTP 404 NOT FOUND") {
             Log.d(
                 "ChatDebug",
@@ -149,7 +150,7 @@ private fun Content(
         Locale.ENGLISH
     )
 
-    val state = viewModel.getChatHistoryState.value
+    val state = viewModel.getChatHistoryState.collectAsState().value
     val job = state.chatHistory?.chat?.job
 
 
@@ -195,7 +196,7 @@ private fun Content(
                         fontFamily = Inter
                     )
                 }
-            } else if (viewModel.getChatsState.value.isLoading) {
+            } else if (viewModel.getChatsState.collectAsState().value.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -394,7 +395,7 @@ private fun CustomInputField(
 
     val text = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.sendMessageState.value.isSuccessful) {
+    LaunchedEffect(viewModel.sendMessageState.collectAsState().value.isSuccessful) {
         if (viewModel.sendMessageState.value.isSuccessful) {
             text.value = ""
             viewModel.resetSendMessageFlag()

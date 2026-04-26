@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -84,20 +85,20 @@ private fun Content(
     val showError = remember { mutableStateOf(false) }
     val messageError = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.forgotPasswordState.value.isSuccessful) {
+    LaunchedEffect(viewModel.forgotPasswordState.collectAsState().value.isSuccessful) {
         if (viewModel.forgotPasswordState.value.isSuccessful) {
             navController.navigate(Screen.RecoveryCode.route)
         }
     }
 
-    LaunchedEffect(viewModel.forgotPasswordState.value.error) {
+    LaunchedEffect(viewModel.forgotPasswordState.collectAsState().value.error) {
         if (!viewModel.forgotPasswordState.value.error.isNullOrEmpty()) {
             showError.value = true
             messageError.value = "Ошибка"
         }
     }
 
-    if (viewModel.forgotPasswordState.value.isLoading) {
+    if (viewModel.forgotPasswordState.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

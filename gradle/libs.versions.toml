@@ -19,6 +19,7 @@ runtime = "1.10.3"
 foundationLayoutVersion = "1.10.4"
 androidxFoundationLayout = "1.10.5"
 volley = "1.2.1"
+cameraCamera2Pipe = "1.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayoutVersion" }
 foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "androidxFoundationLayout" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+androidx-camera-camera2-pipe = { group = "androidx.camera", name = "camera-camera2-pipe", version.ref = "cameraCamera2Pipe" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

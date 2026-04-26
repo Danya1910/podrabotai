@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -97,13 +98,13 @@ private fun Content(
     val showError = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.recoveryCodeState.value.isSuccessful) {
+    LaunchedEffect(viewModel.recoveryCodeState.collectAsState().value.isSuccessful) {
         if (viewModel.recoveryCodeState.value.isSuccessful) {
             navController.navigate(Screen.RecoveryPassword.route)
         }
     }
 
-    LaunchedEffect(viewModel.recoveryCodeState.value.statusCode) {
+    LaunchedEffect(viewModel.recoveryCodeState.collectAsState().value.statusCode) {
         if (viewModel.recoveryCodeState.value.statusCode == 400 ||
             viewModel.recoveryCodeState.value.statusCode == 500
         ) {
@@ -112,7 +113,7 @@ private fun Content(
         }
     }
 
-    if (viewModel.recoveryCodeState.value.isLoading) {
+    if (viewModel.recoveryCodeState.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

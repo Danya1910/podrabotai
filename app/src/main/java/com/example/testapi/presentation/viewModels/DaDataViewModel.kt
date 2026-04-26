@@ -12,6 +12,9 @@ import com.example.testapi.presentation.states.GetChatsState
 import com.example.testapi.presentation.states.GetSuggestionsState
 import com.example.testapi.presentation.states.SendMessageState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.http.Query
 import javax.inject.Inject
@@ -22,35 +25,43 @@ class DaDataViewModel @Inject constructor(
     private val getSuggestionsUseCase: GetSuggestionsUseCase
 ) : ViewModel() {
 
-    private val _getSuggestionsState = mutableStateOf(GetSuggestionsState())
+    private val _getSuggestionsState = MutableStateFlow(GetSuggestionsState())
 
-    val getSuggestionsState: State<GetSuggestionsState> = _getSuggestionsState
+    val getSuggestionsState = _getSuggestionsState.asStateFlow()
 
     fun loadSuggestions(
         query: String
     ) {
         viewModelScope.launch {
-            _getSuggestionsState.value = _getSuggestionsState.value.copy(
-                isLoading = true
-            )
+            _getSuggestionsState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _getSuggestionsState.value = _getSuggestionsState.value.copy(
+                _getSuggestionsState.update {
+                    it.copy(
                     isLoading = false,
                     isSuccessful = true,
                     suggestions = getSuggestionsUseCase(query = query)
                 )
+                    }
             } catch (e: Exception) {
-                _getSuggestionsState.value = _getSuggestionsState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getSuggestionsState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun clearSuggestions() {
-        _getSuggestionsState.value = _getSuggestionsState.value.copy(
-            suggestions = null
-        )
+        _getSuggestionsState.update {
+            it.copy(
+                suggestions = null
+            )
+        }
     }
 }

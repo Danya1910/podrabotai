@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -85,7 +86,7 @@ private fun Content(
     val showError = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.recoveryPasswordState.value.isSuccessful) {
+    LaunchedEffect(viewModel.recoveryPasswordState.collectAsState().value.isSuccessful) {
         if (viewModel.recoveryPasswordState.value.isSuccessful) {
             navController.navigate("main_graph") {
                 popUpTo("auth_graph") {
@@ -96,7 +97,7 @@ private fun Content(
     }
 
 
-    if (viewModel.recoveryPasswordState.value.isLoading) {
+    if (viewModel.recoveryPasswordState.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

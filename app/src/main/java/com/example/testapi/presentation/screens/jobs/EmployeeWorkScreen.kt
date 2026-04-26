@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +59,7 @@ import com.example.testapi.domain.model.BottomNavItem
 import com.example.testapi.presentation.navigation.Screen
 import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.viewModels.BigDataCloudViewModel
+import com.example.testapi.presentation.viewModels.GeocoderViewModel
 import com.example.testapi.presentation.viewModels.LocationViewModel
 import com.example.testapi.presentation.widget.Advertisement
 import com.example.testapi.presentation.widget.CustomBottomBar
@@ -75,6 +78,7 @@ fun EmployeeWorkScreen(
     viewModel: AdvertisementViewModel,
     navController: NavController,
     locationViewModel: LocationViewModel,
+    geocoderViewModel: GeocoderViewModel,
     bigDataCloudViewModel: BigDataCloudViewModel,
 ) {
     BackHandler(enabled = true) {}
@@ -140,6 +144,7 @@ fun EmployeeWorkScreen(
                     filter = filter,
                     locationViewModel = locationViewModel,
                     bigDataCloudViewModel = bigDataCloudViewModel,
+                    geocoderViewModel = geocoderViewModel,
                 )
             }
         )
@@ -156,19 +161,22 @@ private fun Content(
     filter: AdvertisementFilter,
     locationViewModel: LocationViewModel,
     bigDataCloudViewModel: BigDataCloudViewModel,
+    geocoderViewModel: GeocoderViewModel,
     ) {
     val text = remember { mutableStateOf("") }
 
     val message = remember { mutableStateOf("") }
     val activeMessageAdId = remember { mutableStateOf<Int?>(null) }
 
-    val state = viewModel.getAdvertisementsState.value
+    val state = viewModel.getAdvertisementsState.collectAsState().value
 
     val location = locationViewModel.locationState.value
 
     val position = bigDataCloudViewModel.positionState.value
-    val city = remember { mutableStateOf("") }
+    val city = geocoderViewModel.city.value
     val dots = remember { mutableStateOf("") }
+
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -207,23 +215,24 @@ private fun Content(
     }
 
     LaunchedEffect(location) {
-        if (location.location != null && location.error != "Не удалось получить координаты") {
-            bigDataCloudViewModel.loadPosition(
-                lat = location.location.latitude,
-                lng = location.location.longitude
+//        if (location.location != null && location.error != "Не удалось получить координаты") {
+//            bigDataCloudViewModel.loadPosition(
+//                lat = location.location.latitude,
+//                lng = location.location.longitude
+//            )
+//        }
+        location.location?.let {
+
+            geocoderViewModel.loadCity(
+                context,
+                it.latitude,
+                it.longitude
             )
         }
     }
 
-    if (!position.position?.city.isNullOrBlank()) {
-        city.value = position.position.city
-    } else if (!position.error.isNullOrBlank()) {
-        city.value = "Неизвестно"
-    } else {
-        city.value = "Загрузка${dots.value}"
-    }
-
-
+    val cityText =
+        city.ifBlank { "Загрузка${dots.value}" }
 
 
     if (state.isLoading) {
@@ -276,7 +285,7 @@ private fun Content(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = city.value,
+                    text = cityText,
                     fontFamily = Inter,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp,
@@ -375,7 +384,7 @@ private fun Content(
             }
 
             state.isSuccessful -> {
-                items(state.ads) { ad ->
+                items(state.ads.reversed()) { ad ->
                     Advertisement(
                         ad = ad,
                         navController = navController,

@@ -36,11 +36,13 @@ class LocationViewModel @Inject constructor(
                     isSuccessful = true,
                     location = location
                 )
+                Log.d("Location VM", "lat: ${location.latitude}, lng: ${location.longitude}")
             } else {
                 _locationState.value = _locationState.value.copy(
                     isSuccessful = false,
                     error = "Не удалось получить данные"
                 )
+                Log.d("Location VM", "Fail")
             }
         }
     }

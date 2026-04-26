@@ -1,5 +1,6 @@
 package com.example.testapi.presentation.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,11 +35,13 @@ class BigDataCloudViewModel @Inject constructor(
                     isSuccessful = true,
                     position = getPositionUseCase(lat = lat, lng = lng)
                 )
+                Log.d("BigDataCloud VM", _positionState.value.position?.city ?: "city is null")
             } catch (e: Exception) {
                 _positionState.value = _positionState.value.copy(
                     isLoading = false,
                     error = e.message
                 )
+                Log.d("BigDataCloud VM", "error = ${e.message}")
             }
         }
     }

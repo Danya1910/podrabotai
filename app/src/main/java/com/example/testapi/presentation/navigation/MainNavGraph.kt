@@ -28,6 +28,7 @@ import com.example.testapi.presentation.viewModels.AdvertisementViewModel
 import com.example.testapi.presentation.viewModels.BigDataCloudViewModel
 import com.example.testapi.presentation.viewModels.ChatViewModel
 import com.example.testapi.presentation.viewModels.DaDataViewModel
+import com.example.testapi.presentation.viewModels.GeocoderViewModel
 import com.example.testapi.presentation.viewModels.LocationViewModel
 import com.example.testapi.presentation.viewModels.LoginViewModel
 import com.example.testapi.presentation.viewModels.UserViewModel
@@ -45,12 +46,14 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val locationViewModel: LocationViewModel = hiltViewModel(parentEntry)
         val bigDataCloudViewModel: BigDataCloudViewModel = hiltViewModel(parentEntry)
+        val geocoderViewModel: GeocoderViewModel = hiltViewModel(parentEntry)
 
         EmployeeWorkScreen(
             viewModel = viewModel,
             navController = navController,
             locationViewModel = locationViewModel,
             bigDataCloudViewModel = bigDataCloudViewModel,
+            geocoderViewModel = geocoderViewModel
         )
     }
 
@@ -64,11 +67,13 @@ fun NavGraphBuilder.MainNavGraph(navController: NavHostController) {
         val viewModel: AdvertisementViewModel = hiltViewModel(parentEntry)
         val locationViewModel: LocationViewModel = hiltViewModel(parentEntry)
         val bigDataCloudViewModel: BigDataCloudViewModel = hiltViewModel(parentEntry)
+        val geocoderViewModel: GeocoderViewModel = hiltViewModel(parentEntry)
 
         EmployerWorkScreen(
             viewModel = viewModel,
             navController = navController,
             locationViewModel = locationViewModel,
+            geocoderViewModel = geocoderViewModel,
             bigDataCloudViewModel = bigDataCloudViewModel,
         )
     }

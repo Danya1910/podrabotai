@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -139,7 +140,7 @@ private fun Content(
 
     val cleanAddress = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.updateAdvertisementState.value.isSuccessful) {
+    LaunchedEffect(viewModel.updateAdvertisementState.collectAsState().value.isSuccessful) {
         if (!hasAttemptedSubmit.value) return@LaunchedEffect
         if (viewModel.updateAdvertisementState.value.isSuccessful) {
             showMessage.value = true
@@ -155,7 +156,7 @@ private fun Content(
             message.value = "Ошибка обновления данных"
         }
     }
-    LaunchedEffect(viewModel.deleteAdvertisementState.value.isSuccessful) {
+    LaunchedEffect(viewModel.deleteAdvertisementState.collectAsState().value.isSuccessful) {
         if (viewModel.deleteAdvertisementState.value.isSuccessful) {
             navController.navigate(Screen.MyAdvertisements.route) {
                 launchSingleTop = true
@@ -165,7 +166,7 @@ private fun Content(
         }
     }
 
-    LaunchedEffect(viewModel.updateAdvertisementState.value.error) {
+    LaunchedEffect(viewModel.updateAdvertisementState.collectAsState().value.error) {
         if (!hasAttemptedSubmit.value) return@LaunchedEffect
         if (!viewModel.updateAdvertisementState.value.error.isNullOrEmpty()) {
             showMessage.value = true
@@ -179,7 +180,7 @@ private fun Content(
     }
 
 
-    val originState = viewModel.getDetailedAdvertisementState.value
+    val originState = viewModel.getDetailedAdvertisementState.collectAsState().value
     if (originState.isLoading || originState.detailedAd == null) {
         Box(
             contentAlignment = Alignment.Center,
@@ -236,7 +237,7 @@ private fun Content(
         )
     }
 
-    if (viewModel.deleteAdvertisementState.value.isLoading) {
+    if (viewModel.deleteAdvertisementState.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

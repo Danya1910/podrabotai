@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -130,9 +131,9 @@ private fun Content(
     val message = remember { mutableStateOf("") }
     val activeMessageAdId = remember { mutableStateOf<Int?>(null) }
 
-    val state = viewModel.getFavoritesState.value
+    val state = viewModel.getFavoritesState.collectAsState().value
 
-    LaunchedEffect(viewModel.getFavoritesState.value.isSuccessful) {
+    LaunchedEffect(viewModel.getFavoritesState.collectAsState().value.isSuccessful) {
         viewModel.loadFavorites()
     }
 

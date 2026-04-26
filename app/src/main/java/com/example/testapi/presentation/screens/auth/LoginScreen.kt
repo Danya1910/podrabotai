@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -101,7 +102,7 @@ private fun Content(
     val password = remember { mutableStateOf("") }
 
     // ИСПРАВЛЕНО: Следим за успешным входом
-    LaunchedEffect(viewModel.state.value.isSuccessful) {
+    LaunchedEffect(viewModel.state.collectAsState().value.isSuccessful) {
         val targetRoute = if (viewModel.state.value.login?.role == "finder") {
             Screen.EmployeeWork.route
         } else {
@@ -135,7 +136,7 @@ private fun Content(
     }
 
     // ИСПРАВЛЕНО: Следим за ошибками
-    LaunchedEffect(viewModel.state.value.error) {
+    LaunchedEffect(viewModel.state.collectAsState().value.error) {
         val error = viewModel.state.value.error
         if (!error.isNullOrEmpty() && error != "HTTP 404 NOT FOUND") {
             showError.value = true
@@ -143,7 +144,7 @@ private fun Content(
         }
     }
 
-    if (viewModel.state.value.isLoading) {
+    if (viewModel.state.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier

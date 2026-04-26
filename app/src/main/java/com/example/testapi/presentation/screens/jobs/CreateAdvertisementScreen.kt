@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -139,7 +140,7 @@ private fun Content(
     val cleanAddress = remember { mutableStateOf("") }
 
 
-    LaunchedEffect(viewModel.createAdvertisementState.value.isSuccessful) {
+    LaunchedEffect(viewModel.createAdvertisementState.collectAsState().value.isSuccessful) {
         if (!hasAttemptedSubmit.value) return@LaunchedEffect
         if (viewModel.createAdvertisementState.value.isSuccessful) {
             showMessage.value = true
@@ -155,7 +156,7 @@ private fun Content(
         }
     }
 
-    LaunchedEffect(viewModel.createAdvertisementState.value.error) {
+    LaunchedEffect(viewModel.createAdvertisementState.collectAsState().value.error) {
         if (!hasAttemptedSubmit.value) return@LaunchedEffect
         if (!viewModel.createAdvertisementState.value.error.isNullOrEmpty()) {
             showMessage.value = true

@@ -32,6 +32,9 @@ import com.example.testapi.presentation.states.RecoveryCodeState
 import com.example.testapi.presentation.states.RecoveryPasswordState
 import com.example.testapi.presentation.states.RegisterState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,26 +54,26 @@ class LoginViewModel @Inject constructor(
     val localRepository: LocalDataSourceRepository,
     private val socketManager: SocketManager,
 ) : ViewModel() {
-    private val _state = mutableStateOf(LoginState())
-    private val _registerState = mutableStateOf(RegisterState())
-    private val _confirmMailState = mutableStateOf(ConfirmEmailState())
-    private val _forgotPasswordState = mutableStateOf(ForgotPasswordState())
-    private val _recoveryPasswordState = mutableStateOf(RecoveryPasswordState())
-    private val _recoveryCodeState = mutableStateOf(RecoveryCodeState())
-    private val _changePasswordState = mutableStateOf(ChangePasswordState())
-    private val _changeRoleState = mutableStateOf(ChangeRoleState())
+    private val _state = MutableStateFlow(LoginState())
+    private val _registerState = MutableStateFlow(RegisterState())
+    private val _confirmMailState = MutableStateFlow(ConfirmEmailState())
+    private val _forgotPasswordState = MutableStateFlow(ForgotPasswordState())
+    private val _recoveryPasswordState = MutableStateFlow(RecoveryPasswordState())
+    private val _recoveryCodeState = MutableStateFlow(RecoveryCodeState())
+    private val _changePasswordState = MutableStateFlow(ChangePasswordState())
+    private val _changeRoleState = MutableStateFlow(ChangeRoleState())
     var token by mutableStateOf<String?>(null)
     var temporaryId by mutableStateOf<Int?>(null)
         private set
     var code by mutableStateOf<Int?>(null)
-    val state: State<LoginState> = _state
-    val registerState: State<RegisterState> = _registerState
-    val confirmMailState: State<ConfirmEmailState> = _confirmMailState
-    val forgotPasswordState: State<ForgotPasswordState> = _forgotPasswordState
-    val recoveryPasswordState: State<RecoveryPasswordState> = _recoveryPasswordState
-    val recoveryCodeState: State<RecoveryCodeState> = _recoveryCodeState
-    val changePasswordState: State<ChangePasswordState> = _changePasswordState
-    val changeRoleState: State<ChangeRoleState> = _changeRoleState
+    val state = _state.asStateFlow()
+    val registerState = _registerState.asStateFlow()
+    val confirmMailState = _confirmMailState.asStateFlow()
+    val forgotPasswordState = _forgotPasswordState.asStateFlow()
+    val recoveryPasswordState = _recoveryPasswordState.asStateFlow()
+    val recoveryCodeState = _recoveryCodeState.asStateFlow()
+    val changePasswordState = _changePasswordState.asStateFlow()
+    val changeRoleState = _changeRoleState.asStateFlow()
 
     fun saveUserData(email: String, password: String) {
         localRepository.saveData(email, password)
@@ -80,7 +83,11 @@ class LoginViewModel @Inject constructor(
 
     fun register(userName: String, email: String, password: String, role: String) {
         viewModelScope.launch {
-            _registerState.value = _registerState.value.copy(isLoading = true)
+            _registerState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val response = registerUseCase(
                     userName = userName,
@@ -90,16 +97,20 @@ class LoginViewModel @Inject constructor(
                 )
                 temporaryId = response.temporaryId
                 Log.d("LoginViewModel", "Temporary Id(register): $temporaryId")
-                _registerState.value = _registerState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    register = response
-                )
+                _registerState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        register = response
+                    )
+                }
             } catch (e: Exception) {
-                _registerState.value = _registerState.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Ошибка"
-                )
+                _registerState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Ошибка"
+                    )
+                }
             }
         }
     }
@@ -110,7 +121,11 @@ class LoginViewModel @Inject constructor(
 
     fun confirmMail(temporaryId: Int, emailCode: Int) {
         viewModelScope.launch {
-            _confirmMailState.value = _confirmMailState.value.copy(isLoading = true)
+            _confirmMailState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
 
                 Log.d("LoginViewModel", "Temporary Id(confirmMail): $temporaryId")
@@ -123,23 +138,31 @@ class LoginViewModel @Inject constructor(
                 code = emailCode
                 socketManager.connect(token = response.accessToken)
                 Log.d("LoginViewModel", "Token saved(confirmMail): ${response.accessToken}")
-                _confirmMailState.value = _confirmMailState.value.copy(
-                    confirmMail = response,
-                    isLoading = false,
-                    isSuccessful = true
-                )
+                _confirmMailState.update {
+                    it.copy(
+                        confirmMail = response,
+                        isLoading = false,
+                        isSuccessful = true
+                    )
+                }
             } catch (e: Exception) {
-                _confirmMailState.value = _confirmMailState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _confirmMailState.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     fun forgotPassword(email: String) {
         viewModelScope.launch {
-            _forgotPasswordState.value = _forgotPasswordState.value.copy(isLoading = true)
+            _forgotPasswordState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
 
                 Log.d("LoginViewModel", "Sending forgotPassword request for email: $email")
@@ -148,16 +171,20 @@ class LoginViewModel @Inject constructor(
                 )
                 temporaryId = response.temporaryId
                 Log.d("LoginViewModel", "Temporary Id(forgotPasswordResponse): $response")
-                _forgotPasswordState.value = _forgotPasswordState.value.copy(
-                    forgotPassword = response,
-                    isSuccessful = true,
-                    isLoading = false
-                )
+                _forgotPasswordState.update {
+                    it.copy(
+                        forgotPassword = response,
+                        isSuccessful = true,
+                        isLoading = false
+                    )
+                }
             } catch (e: Exception) {
-                _forgotPasswordState.value = _forgotPasswordState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _forgotPasswordState.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
                 Log.d("ForgotPassword", "$e")
             }
         }
@@ -165,7 +192,11 @@ class LoginViewModel @Inject constructor(
 
     fun recoveryCode(temporaryId: Int, emailCode: Int) {
         viewModelScope.launch {
-            _recoveryCodeState.value = _recoveryCodeState.value.copy(isLoading = true)
+            _recoveryCodeState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val request = RecoveryCodeRequest(
                     temporaryId = temporaryId,
@@ -177,25 +208,34 @@ class LoginViewModel @Inject constructor(
                     code = emailCode
                 )
                 Log.d("RecoveryCode", "request: $requestDto")
-                 code = emailCode
-                _recoveryCodeState.value = _recoveryCodeState.value.copy(
-                    statusCode = response.statusCode,
-                    isLoading = false,
-                    message = response.message
-                )
+                code = emailCode
+                _recoveryCodeState.update {
+                    it.copy(
+                        statusCode = response.statusCode,
+                        isLoading = false,
+                        message = response.message
+                    )
+                }
                 Log.d("RecoveryCode", "$response")
             } catch (e: Exception) {
-                _recoveryCodeState.value = _recoveryCodeState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _recoveryCodeState.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
                 Log.d("RecoveryCode", "${_recoveryCodeState.value.error}")
             }
         }
     }
+
     fun recoveryPassword(temporaryId: Int, code: Int, password: String) {
         viewModelScope.launch {
-            _recoveryPasswordState.value = _recoveryPasswordState.value.copy(isLoading = true)
+            _recoveryPasswordState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val response = recoveryPasswordUseCase(
                     temporaryId = temporaryId,
@@ -203,23 +243,31 @@ class LoginViewModel @Inject constructor(
                     password = password
                 )
                 saveTokenUseCase(response.accessToken)
-                _recoveryPasswordState.value = _recoveryPasswordState.value.copy(
-                    recoveryPassword = response,
-                    isLoading = false
-                )
+                _recoveryPasswordState.update {
+                    it.copy(
+                        recoveryPassword = response,
+                        isLoading = false
+                    )
+                }
                 socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
-                _recoveryPasswordState.value = _recoveryPasswordState.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _recoveryPasswordState.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            _state.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val response = loginUseCase(
                     email = email,
@@ -228,26 +276,32 @@ class LoginViewModel @Inject constructor(
                 saveTokenUseCase(response.accessToken)
                 Log.d("LoginViewModel", "Token saved(login): ${response.accessToken}")
                 token = getTokenUseCase()
-                _state.value = _state.value.copy(
-                    login = response,
-                    isSuccessful = true,
-                    isLoading = false
-                )
+                _state.update {
+                    it.copy(
+                        login = response,
+                        isSuccessful = true,
+                        isLoading = false
+                    )
+                }
                 socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = e.message,
-                    isLoading = false
-                )
+                _state.update {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     fun changePassword(old_password: String, new_password: String) {
         viewModelScope.launch {
-            _changePasswordState.value = _changePasswordState.value.copy(
-                isLoading = true
-            )
+            _changePasswordState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
                 val response = changePasswordUseCase(
                     old_password = old_password,
@@ -255,48 +309,57 @@ class LoginViewModel @Inject constructor(
                 )
                 saveTokenUseCase(response.accessToken)
                 Log.d("LoginViewModel", "Token saved(change_password): ${response.accessToken}")
-                _changePasswordState.value = _changePasswordState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    changePassword = response
-                )
+                _changePasswordState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        changePassword = response
+                    )
+                }
                 socketManager.connect(token = response.accessToken)
             } catch (e: Exception) {
-                _changePasswordState.value = _changePasswordState.value.copy(
-                    isLoading = false,
-                    isSuccessful = false,
-                    error = e.message
-                )
-
+                _changePasswordState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun changeRole() {
         viewModelScope.launch {
-            _changeRoleState.value = _changeRoleState.value.copy(
-                isLoading = true
-            )
-            try{
-                _changeRoleState.value = _changeRoleState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    changeRole = changeRoleUseCase()
+            _changeRoleState.update {
+                it.copy(
+                    isLoading = true
                 )
+            }
+            try {
+                _changeRoleState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        changeRole = changeRoleUseCase()
+                    )
+                }
             } catch (e: Exception) {
-                _changeRoleState.value = _changeRoleState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _changeRoleState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            try{
+            try {
                 logoutUseCase()
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 Log.d("LoginViewModel DEBUG", "${e.message}")
             }
         }
@@ -309,15 +372,27 @@ class LoginViewModel @Inject constructor(
     }
 
     fun clearErrors() {
-        _state.value = _state.value.copy(error = null)
-        _registerState.value = _registerState.value.copy(error = null)
-        _confirmMailState.value = _confirmMailState.value.copy(error = null)
-        _forgotPasswordState.value = _forgotPasswordState.value.copy(error = null)
-        _forgotPasswordState.value = _forgotPasswordState.value.copy(isSuccessful = false)
-        _recoveryPasswordState.value = _recoveryPasswordState.value.copy(error = null)
-        _recoveryCodeState.value = _recoveryCodeState.value.copy(error = null)
-        _recoveryCodeState.value = _recoveryCodeState.value.copy(statusCode = 0)
-        _changePasswordState.value = _changePasswordState.value.copy(error = null)
+        _state.update {
+            it.copy(error = null)
+        }
+        _registerState.update {
+            it.copy(error = null)
+        }
+        _confirmMailState.update {
+            it.copy(error = null)
+        }
+        _forgotPasswordState.update {
+            it.copy(error = null, isSuccessful = false)
+        }
+        _recoveryPasswordState.update {
+            it.copy(error = null)
+        }
+        _recoveryCodeState.update {
+            it.copy(error = null, statusCode = 0)
+        }
+        _changePasswordState.update {
+            it.copy(error = null)
+        }
     }
 
 }

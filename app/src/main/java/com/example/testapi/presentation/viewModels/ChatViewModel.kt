@@ -17,6 +17,8 @@ import com.example.testapi.presentation.states.GetChatsState
 import com.example.testapi.presentation.states.SendMessageState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,16 +33,16 @@ class ChatViewModel @Inject constructor(
     private val socketManager: SocketManager,
 ) : ViewModel() {
 
-    private val _getChatsState = mutableStateOf(GetChatsState())
-    private val _getChatHistoryState = mutableStateOf(GetChatHistoryState())
-    private val _createChatState = mutableStateOf(CreateChatState())
-    private val _sendMessageState = mutableStateOf(SendMessageState())
+    private val _getChatsState = MutableStateFlow(GetChatsState())
+    private val _getChatHistoryState = MutableStateFlow(GetChatHistoryState())
+    private val _createChatState = MutableStateFlow(CreateChatState())
+    private val _sendMessageState = MutableStateFlow(SendMessageState())
     private val _currentPenpalId = MutableStateFlow<Int?>(null)
 
-    val getChatsState: State<GetChatsState> = _getChatsState
-    val getChatHistoryState: State<GetChatHistoryState> = _getChatHistoryState
-    val createChatState: State<CreateChatState> = _createChatState
-    val sendMessageState: State<SendMessageState> = _sendMessageState
+    val getChatsState = _getChatsState.asStateFlow()
+    val getChatHistoryState = _getChatHistoryState.asStateFlow()
+    val createChatState = _createChatState.asStateFlow()
+    val sendMessageState = _sendMessageState.asStateFlow()
 
     fun setCurrentPenpal(penpalId: Int) {
         _currentPenpalId.value = penpalId
@@ -53,11 +55,17 @@ class ChatViewModel @Inject constructor(
     private fun observePing() {
         viewModelScope.launch {
             observePingUseCase().collect { penpalId ->
-                Log.d("ChatVM_Debug", "Socket says: $penpalId, My current screen ID is: ${_currentPenpalId.value}")
+                Log.d(
+                    "ChatVM_Debug",
+                    "Socket says: $penpalId, My current screen ID is: ${_currentPenpalId.value}"
+                )
                 if (_currentPenpalId.value == penpalId) {
                     loadHistory(penpalId)
                 } else {
-                    Log.d("ChatVM_Debug", "ID MISMATCH: Expected ${_currentPenpalId.value}, got $penpalId")
+                    Log.d(
+                        "ChatVM_Debug",
+                        "ID MISMATCH: Expected ${_currentPenpalId.value}, got $penpalId"
+                    )
                 }
             }
         }
@@ -65,40 +73,52 @@ class ChatViewModel @Inject constructor(
 
     fun loadChats() {
         viewModelScope.launch {
-            _getChatsState.value = _getChatsState.value.copy(
-                isLoading = true
-            )
+            _getChatsState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _getChatsState.value = _getChatsState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    chats = getChatsUseCase()
-                )
+                _getChatsState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        chats = getChatsUseCase()
+                    )
+                }
             } catch (e: Exception) {
-                _getChatsState.value = _getChatsState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getChatsState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun loadHistory(penpalId: Int) {
         viewModelScope.launch {
-            _getChatHistoryState.value = _getChatHistoryState.value.copy(
-                isLoading = true
-            )
+            _getChatHistoryState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _getChatHistoryState.value = _getChatHistoryState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    chatHistory = getChatHistoryUseCase(penpalId = penpalId)
-                )
+                _getChatHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        chatHistory = getChatHistoryUseCase(penpalId = penpalId)
+                    )
+                }
             } catch (e: Exception) {
-                _getChatHistoryState.value = _getChatHistoryState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _getChatHistoryState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -108,20 +128,26 @@ class ChatViewModel @Inject constructor(
         jobId: Int
     ) {
         viewModelScope.launch {
-            _createChatState.value = _createChatState.value.copy(
-                isLoading = true
-            )
+            _createChatState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _createChatState.value = _createChatState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    createChat = createChatUseCase(penpalId = penpalId, jobId = jobId)
-                )
+                _createChatState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        createChat = createChatUseCase(penpalId = penpalId, jobId = jobId)
+                    )
+                }
             } catch (e: Exception) {
-                _createChatState.value = _createChatState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _createChatState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
@@ -131,26 +157,34 @@ class ChatViewModel @Inject constructor(
         text: String
     ) {
         viewModelScope.launch {
-            _sendMessageState.value = _sendMessageState.value.copy(
-                isLoading = true
-            )
+            _sendMessageState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
             try {
-                _sendMessageState.value = _sendMessageState.value.copy(
-                    isLoading = false,
-                    isSuccessful = true,
-                    sendMessage = sendMessageUseCase(penpalId = penpalId, text = text)
-                )
-            } catch (e: Exception){
-                _sendMessageState.value = _sendMessageState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _sendMessageState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccessful = true,
+                        sendMessage = sendMessageUseCase(penpalId = penpalId, text = text)
+                    )
+                }
+            } catch (e: Exception) {
+                _sendMessageState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun resetSendMessageFlag() {
-        _sendMessageState.value = _sendMessageState.value.copy(isSuccessful = false)
+        _sendMessageState.update {
+            it.copy(isSuccessful = false)
+        }
     }
 
 }

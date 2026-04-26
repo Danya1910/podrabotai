@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -82,7 +83,7 @@ private fun Content(
     val showError = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.changePasswordState.value.isSuccessful) {
+    LaunchedEffect(viewModel.changePasswordState.collectAsState().value.isSuccessful) {
         Log.d(
             "ChangePasswordScreen",
             "Role: ${viewModel.changePasswordState.value.changePassword?.role}"
@@ -103,7 +104,7 @@ private fun Content(
         }
     }
 
-    LaunchedEffect(viewModel.changePasswordState.value.error) {
+    LaunchedEffect(viewModel.changePasswordState.collectAsState().value.error) {
         Log.d("ChangePasswordScreen", "${viewModel.changePasswordState.value.error}")
         val error = viewModel.changePasswordState.value.error
         if (!error.isNullOrEmpty()) {

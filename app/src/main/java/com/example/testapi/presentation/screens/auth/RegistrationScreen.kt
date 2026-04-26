@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -93,7 +94,7 @@ fun RegistrationContent(
     val passwordFocusRequester = remember { FocusRequester() }
     val repeatPasswordFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(viewModel.registerState.value.isSuccessful) {
+    LaunchedEffect(viewModel.registerState.collectAsState().value.isSuccessful) {
         if (viewModel.registerState.value.isSuccessful) {
             viewModel.localRepository.saveData(
                 email = email.value,
@@ -110,13 +111,13 @@ fun RegistrationContent(
         }
     }
 
-    LaunchedEffect(viewModel.registerState.value.error) {
+    LaunchedEffect(viewModel.registerState.collectAsState().value.error) {
         if (!viewModel.registerState.value.error.isNullOrEmpty()) {
             Log.d("RegistrationScreen", "${viewModel.registerState.value.error}")
         }
     }
 
-    if (viewModel.registerState.value.isLoading) {
+    if (viewModel.registerState.collectAsState().value.isLoading) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
